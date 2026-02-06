@@ -60,8 +60,8 @@
     {
       "action": "expect",
       "type": "visible",
-      "selector": ":text('다음 상령일'), :text('남음')",
-      "description": "다음 상령일 정보가 표시되는지 확인"
+      "selector": ":text('보험 나이 오르는 날'), :text('남았어요')",
+      "description": "보험 나이 오르는 날 정보가 표시되는지 확인"
     },
     {
       "action": "screenshot",
