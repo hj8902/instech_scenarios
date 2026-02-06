@@ -1,39 +1,35 @@
 {
   "id": "login",
-  "name": "로그인",
+  "name": "로그인 (카카오 수동)",
   "type": "setup",
   "requiresAuth": false,
-  "variables": ["baseUrl", "testEmail", "testPassword"],
+  "variables": ["baseUrl"],
+  "description": "카카오 로그인을 수동으로 수행하고 인증 상태를 저장합니다. 브라우저가 headed 모드로 열리며, 사용자가 직접 카카오 로그인을 완료하면 자동으로 인증 상태가 저장됩니다.",
   "steps": [
     {
+      "action": "launchBrowser",
+      "headless": false,
+      "description": "브라우저를 headed 모드로 실행 (화면에 표시)"
+    },
+    {
       "action": "navigate",
-      "url": "{{baseUrl}}/login",
-      "description": "로그인 페이지로 이동"
+      "url": "{{baseUrl}}/web-login",
+      "description": "instech 로그인 페이지로 이동"
     },
     {
       "action": "screenshot",
       "description": "로그인 페이지 스크린샷"
     },
     {
-      "action": "fill",
-      "selector": "input[name='email']",
-      "value": "{{testEmail}}",
-      "description": "이메일 입력"
+      "action": "manualAction",
+      "instruction": "카카오 로그인 버튼을 클릭하고 카카오 계정으로 로그인을 완료해주세요.",
+      "description": "사용자가 직접 카카오 로그인을 수행"
     },
     {
-      "action": "fill",
-      "selector": "input[name='password']",
-      "value": "{{testPassword}}",
-      "description": "비밀번호 입력"
-    },
-    {
-      "action": "click",
-      "selector": "button[type='submit']",
-      "description": "로그인 버튼 클릭"
-    },
-    {
-      "action": "waitForNavigation",
-      "description": "페이지 이동 대기"
+      "action": "waitForUrl",
+      "pattern": "{{baseUrl}}/**",
+      "timeout": 120000,
+      "description": "로그인 완료 후 instech 앱으로 돌아올 때까지 대기 (최대 2분)"
     },
     {
       "action": "screenshot",
