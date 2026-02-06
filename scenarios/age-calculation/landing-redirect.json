@@ -1,0 +1,32 @@
+{
+  "id": "age-calc-landing-redirect",
+  "name": "보험 나이 계산 - Landing 리다이렉트",
+  "type": "test",
+  "requiresAuth": true,
+  "variables": ["baseUrl"],
+  "steps": [
+    {
+      "action": "loadState",
+      "description": "저장된 인증 상태 로드"
+    },
+    {
+      "action": "navigate",
+      "url": "{{baseUrl}}/age-calculation/landing",
+      "description": "Landing 페이지로 이동"
+    },
+    {
+      "action": "waitForNavigation",
+      "description": "리다이렉트 대기"
+    },
+    {
+      "action": "expect",
+      "type": "url",
+      "value": "/age-calculation/input",
+      "description": "생년월일 미입력 시 Input 페이지로 리다이렉트되는지 확인"
+    },
+    {
+      "action": "screenshot",
+      "description": "리다이렉트 결과 스크린샷"
+    }
+  ]
+}

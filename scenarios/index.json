@@ -1,0 +1,37 @@
+{
+  "version": "1.0.0",
+  "basePageUrl": "https://hj8902.github.io/instech_scenarios",
+  "scenarios": [
+    {
+      "id": "login",
+      "name": "로그인",
+      "description": "인증이 필요한 시나리오의 전제조건. 로그인 후 인증 상태를 저장합니다.",
+      "type": "setup",
+      "path": "_setup/login.json"
+    },
+    {
+      "id": "age-calc-landing-redirect",
+      "name": "보험 나이 계산 - Landing 리다이렉트",
+      "description": "Landing 페이지 접속 시 생년월일 미입력 상태면 Input 페이지로 리다이렉트되는지 확인합니다.",
+      "type": "test",
+      "requiresAuth": true,
+      "path": "age-calculation/landing-redirect.json"
+    },
+    {
+      "id": "age-calc-input-to-result",
+      "name": "보험 나이 계산 - 생년월일 입력 → 결과 확인",
+      "description": "생년월일 입력 후 보험나이, 다음 상령일, 보험료 비교 결과를 확인합니다.",
+      "type": "test",
+      "requiresAuth": true,
+      "path": "age-calculation/input-to-result.json"
+    },
+    {
+      "id": "age-calc-edit-birthdate",
+      "name": "보험 나이 계산 - 생년월일 수정",
+      "description": "결과 페이지에서 생년월일을 수정하고 결과가 갱신되는지 확인합니다.",
+      "type": "test",
+      "requiresAuth": true,
+      "path": "age-calculation/edit-birthdate.json"
+    }
+  ]
+}

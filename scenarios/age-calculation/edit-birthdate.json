@@ -1,0 +1,71 @@
+{
+  "id": "age-calc-edit-birthdate",
+  "name": "보험 나이 계산 - 생년월일 수정",
+  "type": "test",
+  "requiresAuth": true,
+  "variables": ["baseUrl", "newBirthDate"],
+  "defaults": {
+    "newBirthDate": "19950515"
+  },
+  "steps": [
+    {
+      "action": "loadState",
+      "description": "저장된 인증 상태 로드"
+    },
+    {
+      "action": "navigate",
+      "url": "{{baseUrl}}/age-calculation/result",
+      "description": "결과 페이지로 이동"
+    },
+    {
+      "action": "screenshot",
+      "description": "수정 전 결과 페이지 스크린샷"
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text('수정'), [data-testid='edit-birthdate']",
+      "description": "생년월일 수정 버튼 클릭"
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-testid='bottom-sheet'], [role='dialog']",
+      "state": "visible",
+      "description": "수정 바텀시트가 열릴 때까지 대기"
+    },
+    {
+      "action": "screenshot",
+      "description": "수정 바텀시트 스크린샷"
+    },
+    {
+      "action": "clear",
+      "selector": "input",
+      "description": "기존 생년월일 입력값 삭제"
+    },
+    {
+      "action": "fill",
+      "selector": "input",
+      "value": "{{newBirthDate}}",
+      "description": "새 생년월일 입력"
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text('확인'), button:has-text('저장')",
+      "description": "확인/저장 버튼 클릭"
+    },
+    {
+      "action": "waitForResponse",
+      "urlPattern": "**/insurance/age",
+      "description": "API 응답 대기"
+    },
+    {
+      "action": "screenshot",
+      "description": "수정 후 결과 페이지 스크린샷"
+    },
+    {
+      "action": "expect",
+      "type": "visible",
+      "selector": ":text('세')",
+      "description": "변경된 보험 나이가 표시되는지 확인"
+    }
+  ]
+}

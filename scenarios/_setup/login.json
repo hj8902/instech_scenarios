@@ -1,0 +1,47 @@
+{
+  "id": "login",
+  "name": "로그인",
+  "type": "setup",
+  "requiresAuth": false,
+  "variables": ["baseUrl", "testEmail", "testPassword"],
+  "steps": [
+    {
+      "action": "navigate",
+      "url": "{{baseUrl}}/login",
+      "description": "로그인 페이지로 이동"
+    },
+    {
+      "action": "screenshot",
+      "description": "로그인 페이지 스크린샷"
+    },
+    {
+      "action": "fill",
+      "selector": "input[name='email']",
+      "value": "{{testEmail}}",
+      "description": "이메일 입력"
+    },
+    {
+      "action": "fill",
+      "selector": "input[name='password']",
+      "value": "{{testPassword}}",
+      "description": "비밀번호 입력"
+    },
+    {
+      "action": "click",
+      "selector": "button[type='submit']",
+      "description": "로그인 버튼 클릭"
+    },
+    {
+      "action": "waitForNavigation",
+      "description": "페이지 이동 대기"
+    },
+    {
+      "action": "screenshot",
+      "description": "로그인 완료 후 스크린샷"
+    },
+    {
+      "action": "saveState",
+      "description": "인증 상태(쿠키/세션) 저장"
+    }
+  ]
+}
