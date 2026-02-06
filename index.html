@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>instech 시나리오 테스트 목록</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-bg: #eff6ff;
+    --setup: #8b5cf6;
+    --setup-bg: #f5f3ff;
+    --test: #059669;
+    --test-bg: #ecfdf5;
+    --border: #e5e7eb;
+    --text: #1f2937;
+    --text-light: #6b7280;
+    --text-lighter: #9ca3af;
+    --bg: #f9fafb;
+    --white: #ffffff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* Header */
+  .header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 0;
+  }
+  .header-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .header p {
+    font-size: 14px;
+    color: var(--text-light);
+  }
+  .header-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--text-lighter);
+  }
+  .header-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Main */
+  .main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  /* Category */
+  .category {
+    margin-bottom: 32px;
+  }
+  .category-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-lighter);
+    margin-bottom: 12px;
+    padding-left: 4px;
+  }
+
+  /* Scenario Card */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.15s;
+  }
+  .card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-header {
+    padding: 16px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    user-select: none;
+  }
+  .card-header:hover {
+    background: var(--bg);
+  }
+  .card-arrow {
+    font-size: 11px;
+    color: var(--text-lighter);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+    width: 16px;
+    text-align: center;
+  }
+  .card.open .card-arrow {
+    transform: rotate(90deg);
+  }
+
+  /* Badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .badge.setup { background: var(--setup-bg); color: var(--setup); }
+  .badge.test { background: var(--test-bg); color: var(--test); }
+  .badge.auth { background: #fef3c7; color: #92400e; font-size: 10px; }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 600;
+    flex: 1;
+  }
+  .card-step-count {
+    font-size: 12px;
+    color: var(--text-lighter);
+    flex-shrink: 0;
+  }
+
+  /* Card Body */
+  .card-body {
+    display: none;
+    border-top: 1px solid var(--border);
+    padding: 16px 20px;
+  }
+  .card.open .card-body {
+    display: block;
+  }
+  .card-desc {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    line-height: 1.7;
+  }
+
+  /* Steps */
+  .steps-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-lighter);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+  .step-list {
+    list-style: none;
+    position: relative;
+  }
+  .step-list::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 14px;
+    bottom: 14px;
+    width: 2px;
+    background: var(--border);
+  }
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 6px 0;
+    position: relative;
+  }
+  .step-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-light);
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .step-item.action .step-dot { border-color: var(--primary); color: var(--primary); background: var(--primary-bg); }
+  .step-item.check .step-dot { border-color: var(--test); color: var(--test); background: var(--test-bg); }
+  .step-item.screenshot .step-dot { border-color: var(--text-lighter); color: var(--text-lighter); }
+  .step-item.manual .step-dot { border-color: #f59e0b; color: #f59e0b; background: #fffbeb; }
+
+  .step-content {
+    flex: 1;
+    padding-top: 2px;
+  }
+  .step-desc {
+    font-size: 14px;
+  }
+  .step-action-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .step-action-tag.navigate { background: #dbeafe; color: #1e40af; }
+  .step-action-tag.fill { background: #fce7f3; color: #9d174d; }
+  .step-action-tag.click { background: #e0e7ff; color: #3730a3; }
+  .step-action-tag.blur { background: #fef3c7; color: #92400e; }
+  .step-action-tag.expect { background: #d1fae5; color: #065f46; }
+  .step-action-tag.screenshot { background: #f3f4f6; color: #6b7280; }
+  .step-action-tag.wait { background: #fef9c3; color: #854d0e; }
+  .step-action-tag.manual { background: #fff7ed; color: #c2410c; }
+  .step-action-tag.terms { background: #ede9fe; color: #6d28d9; }
+  .step-action-tag.state { background: #f0fdf4; color: #166534; }
+
+  /* Variables */
+  .variables {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+  }
+  .variables-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-lighter);
+    margin-bottom: 6px;
+  }
+  .var-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    background: #f3f4f6;
+    color: var(--text-light);
+    margin-right: 6px;
+    margin-bottom: 4px;
+  }
+
+  /* Loading & Error */
+  .loading {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-light);
+  }
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error {
+    text-align: center;
+    padding: 60px 20px;
+    color: #ef4444;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-lighter);
+    padding: 24px;
+    margin-top: 16px;
+  }
+
+  @media (max-width: 640px) {
+    .header-inner, .main { padding: 0 16px; }
+    .main { padding-top: 16px; }
+    .header-meta { flex-wrap: wrap; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <h1>instech 시나리오 테스트 목록</h1>
+    <p>보험 나이 계산 등 주요 기능의 E2E 테스트 시나리오를 확인할 수 있습니다.</p>
+    <div class="header-meta">
+      <span id="meta-version"></span>
+      <span id="meta-count"></span>
+    </div>
+  </div>
+</div>
+
+<div class="main" id="content">
+  <div class="loading">
+    <div class="spinner"></div>
+    <div>시나리오를 불러오는 중...</div>
+  </div>
+</div>
+
+<div class="footer">
+  instech 시나리오 테스트 &middot; Claude Code (instech-scenario-test skill)로 실행
+</div>
+
+<script>
+const BASE = 'https://hj8902.github.io/instech_scenarios/scenarios';
+
+const ACTION_LABELS = {
+  navigate: '이동',
+  fill: '입력',
+  click: '클릭',
+  clear: '삭제',
+  blur: '포커스해제',
+  waitFor: '대기',
+  waitForNavigation: '대기',
+  waitForResponse: '대기',
+  waitForTimeout: '대기',
+  waitForUrl: '대기',
+  expect: '검증',
+  screenshot: '캡처',
+  loadState: '상태로드',
+  saveState: '상태저장',
+  launchBrowser: '브라우저',
+  manualAction: '수동',
+  handleTermsAgreement: '약관동의',
+};
+
+const ACTION_TAG_CLASS = {
+  navigate: 'navigate',
+  fill: 'fill',
+  click: 'click',
+  clear: 'fill',
+  blur: 'blur',
+  waitFor: 'wait',
+  waitForNavigation: 'wait',
+  waitForResponse: 'wait',
+  waitForTimeout: 'wait',
+  waitForUrl: 'wait',
+  expect: 'expect',
+  screenshot: 'screenshot',
+  loadState: 'state',
+  saveState: 'state',
+  launchBrowser: 'navigate',
+  manualAction: 'manual',
+  handleTermsAgreement: 'terms',
+};
+
+const STEP_TYPE = {
+  navigate: 'action',
+  fill: 'action',
+  click: 'action',
+  clear: 'action',
+  blur: 'action',
+  expect: 'check',
+  screenshot: 'screenshot',
+  manualAction: 'manual',
+  handleTermsAgreement: 'action',
+};
+
+async function load() {
+  const content = document.getElementById('content');
+
+  try {
+    const indexRes = await fetch(`${BASE}/index.json`);
+    if (!indexRes.ok) throw new Error('index.json 로드 실패');
+    const index = await indexRes.json();
+
+    document.getElementById('meta-version').textContent = `v${index.version}`;
+    document.getElementById('meta-count').textContent = `${index.scenarios.length}개 시나리오`;
+
+    // Fetch all scenarios
+    const scenarios = await Promise.all(
+      index.scenarios.map(async (s) => {
+        try {
+          const res = await fetch(`${BASE}/${s.path}`);
+          if (!res.ok) return { ...s, steps: [], _error: true };
+          const detail = await res.json();
+          return { ...s, ...detail };
+        } catch {
+          return { ...s, steps: [], _error: true };
+        }
+      })
+    );
+
+    // Group by type
+    const setup = scenarios.filter(s => s.type === 'setup');
+    const tests = scenarios.filter(s => s.type === 'test');
+
+    let html = '';
+
+    if (setup.length > 0) {
+      html += '<div class="category"><div class="category-title">사전 설정 (Setup)</div>';
+      setup.forEach(s => { html += renderCard(s); });
+      html += '</div>';
+    }
+
+    // Group tests by folder/feature
+    const groups = {};
+    tests.forEach(s => {
+      const folder = s.path.split('/')[0] || '기타';
+      const label = folder.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      if (!groups[folder]) groups[folder] = { label, scenarios: [] };
+      groups[folder].scenarios.push(s);
+    });
+
+    const FEATURE_LABELS = {
+      'age-calculation': '보험 나이 계산',
+    };
+
+    Object.entries(groups).forEach(([folder, group]) => {
+      const label = FEATURE_LABELS[folder] || group.label;
+      html += `<div class="category"><div class="category-title">${label} (${group.scenarios.length}개)</div>`;
+      group.scenarios.forEach(s => { html += renderCard(s); });
+      html += '</div>';
+    });
+
+    content.innerHTML = html;
+
+    // Toggle handlers
+    content.querySelectorAll('.card-header').forEach(h => {
+      h.addEventListener('click', () => {
+        h.parentElement.classList.toggle('open');
+      });
+    });
+
+  } catch (e) {
+    content.innerHTML = `<div class="error"><p>시나리오를 불러오지 못했습니다.</p><p style="font-size:13px;margin-top:8px">${e.message}</p></div>`;
+  }
+}
+
+function renderCard(s) {
+  const typeBadge = s.type === 'setup'
+    ? '<span class="badge setup">사전설정</span>'
+    : '<span class="badge test">테스트</span>';
+  const authBadge = s.requiresAuth ? '<span class="badge auth">로그인 필요</span>' : '';
+  const stepCount = s.steps ? s.steps.length : 0;
+
+  let stepsHtml = '';
+  if (s.steps && s.steps.length > 0) {
+    stepsHtml = '<div class="steps-title">실행 단계</div><ul class="step-list">';
+    s.steps.forEach((step, i) => {
+      const action = step.action || '';
+      const tagLabel = ACTION_LABELS[action] || action;
+      const tagClass = ACTION_TAG_CLASS[action] || '';
+      const stepType = STEP_TYPE[action] || 'action';
+      const desc = step.description || '';
+
+      stepsHtml += `
+        <li class="step-item ${stepType}">
+          <div class="step-dot">${i + 1}</div>
+          <div class="step-content">
+            <div class="step-desc">
+              <span class="step-action-tag ${tagClass}">${tagLabel}</span>
+              ${desc}
+            </div>
+          </div>
+        </li>`;
+    });
+    stepsHtml += '</ul>';
+  }
+
+  let varsHtml = '';
+  if (s.variables && s.variables.length > 0) {
+    varsHtml = '<div class="variables"><div class="variables-title">필요 변수</div>';
+    s.variables.forEach(v => {
+      const def = s.defaults && s.defaults[v] ? ` = ${s.defaults[v]}` : '';
+      varsHtml += `<span class="var-chip">{{${v}}}${def}</span>`;
+    });
+    varsHtml += '</div>';
+  }
+
+  return `
+    <div class="card">
+      <div class="card-header">
+        <span class="card-arrow">&#9654;</span>
+        ${typeBadge}
+        ${authBadge}
+        <span class="card-title">${s.name}</span>
+        <span class="card-step-count">${stepCount}단계</span>
+      </div>
+      <div class="card-body">
+        <div class="card-desc">${s.description || ''}</div>
+        ${stepsHtml}
+        ${varsHtml}
+      </div>
+    </div>`;
+}
+
+load();
+</script>
+
+</body>
+</html>
