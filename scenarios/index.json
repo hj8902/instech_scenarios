@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "basePageUrl": "https://hj8902.github.io/instech_scenarios",
   "scenarios": [
     {
@@ -12,7 +12,7 @@
     {
       "id": "age-calc-landing-redirect",
       "name": "보험 나이 계산 - Landing 리다이렉트",
-      "description": "Landing 페이지 접속 시 생년월일 미입력 상태면 Input 페이지로 리다이렉트되는지 확인합니다.",
+      "description": "Landing 페이지 접속 시 생년월일 유무에 따라 Input 또는 Result 페이지로 리다이렉트되는지 확인합니다.",
       "type": "test",
       "requiresAuth": true,
       "path": "age-calculation/landing-redirect.json"
@@ -24,6 +24,22 @@
       "type": "test",
       "requiresAuth": true,
       "path": "age-calculation/input-to-result.json"
+    },
+    {
+      "id": "age-calc-invalid-birthdate",
+      "name": "보험 나이 계산 - 잘못된 생년월일 입력",
+      "description": "존재하지 않는 날짜(13월, 윤년 아닌 2/29 등)를 입력하면 에러 메시지가 표시되고, 올바른 값 입력 시 에러가 사라지는지 확인합니다.",
+      "type": "test",
+      "requiresAuth": true,
+      "path": "age-calculation/invalid-birthdate.json"
+    },
+    {
+      "id": "age-calc-terms-masking",
+      "name": "보험 나이 계산 - 약관 미동의 시 마스킹",
+      "description": "결과 페이지에서 약관 동의 전에는 보험나이가 '??세'로 마스킹되고, 동의 후 실제 데이터가 표시되는지 확인합니다.",
+      "type": "test",
+      "requiresAuth": true,
+      "path": "age-calculation/terms-masking.json"
     },
     {
       "id": "age-calc-edit-birthdate",

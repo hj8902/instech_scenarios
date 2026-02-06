@@ -18,17 +18,22 @@
       "description": "결과 페이지로 이동"
     },
     {
+      "action": "handleTermsAgreement",
+      "description": "약관 동의 바텀시트가 나타나면 동의 처리",
+      "fallback": "skip"
+    },
+    {
       "action": "screenshot",
       "description": "수정 전 결과 페이지 스크린샷"
     },
     {
       "action": "click",
-      "selector": "button:has-text('수정'), [data-testid='edit-birthdate']",
-      "description": "생년월일 수정 버튼 클릭"
+      "selector": "text=생년월일 >> xpath=.. >> svg",
+      "description": "생년월일 옆 연필 아이콘 클릭 (수정 바텀시트 열기)"
     },
     {
       "action": "waitFor",
-      "selector": "[data-testid='bottom-sheet'], [role='dialog']",
+      "selector": "[role='dialog']",
       "state": "visible",
       "description": "수정 바텀시트가 열릴 때까지 대기"
     },
@@ -49,8 +54,8 @@
     },
     {
       "action": "click",
-      "selector": "button:has-text('확인'), button:has-text('저장')",
-      "description": "확인/저장 버튼 클릭"
+      "selector": "button:has-text('입력 완료')",
+      "description": "'입력 완료' 버튼 클릭"
     },
     {
       "action": "waitForResponse",

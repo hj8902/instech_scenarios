@@ -1,0 +1,68 @@
+{
+  "id": "age-calc-terms-masking",
+  "name": "보험 나이 계산 - 약관 미동의 시 마스킹 확인",
+  "type": "test",
+  "requiresAuth": true,
+  "variables": ["baseUrl"],
+  "description": "결과 페이지에서 약관 동의 전에는 보험나이와 상령일이 '??'로 마스킹되고, 동의 후 실제 데이터가 표시되는지 확인합니다.",
+  "steps": [
+    {
+      "action": "loadState",
+      "description": "저장된 인증 상태 로드"
+    },
+    {
+      "action": "navigate",
+      "url": "{{baseUrl}}/age-calculation/result",
+      "description": "결과 페이지로 이동"
+    },
+    {
+      "action": "screenshot",
+      "description": "약관 동의 전 결과 페이지 스크린샷 (마스킹 상태)"
+    },
+    {
+      "action": "expect",
+      "type": "visible",
+      "selector": "[role='dialog'][aria-modal='true']",
+      "description": "약관 동의 바텀시트가 노출되는지 확인"
+    },
+    {
+      "action": "expect",
+      "type": "visible",
+      "selector": ":text('??')",
+      "description": "보험 나이가 '??세'로 마스킹되어 있는지 확인"
+    },
+    {
+      "action": "screenshot",
+      "description": "마스킹 상태 + 약관 바텀시트 스크린샷"
+    },
+    {
+      "action": "handleTermsAgreement",
+      "description": "약관 동의 처리"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 2000,
+      "description": "약관 동의 후 데이터 로딩 대기 (1.5초 딜레이 포함)"
+    },
+    {
+      "action": "screenshot",
+      "description": "약관 동의 후 결과 페이지 스크린샷"
+    },
+    {
+      "action": "expect",
+      "type": "hidden",
+      "selector": ":text('??세')",
+      "description": "'??세' 마스킹이 사라졌는지 확인"
+    },
+    {
+      "action": "expect",
+      "type": "visible",
+      "selector": ":text('세')",
+      "description": "실제 보험 나이가 표시되는지 확인"
+    },
+    {
+      "action": "screenshot",
+      "description": "마스킹 해제 후 최종 스크린샷"
+    }
+  ]
+}

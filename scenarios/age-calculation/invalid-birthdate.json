@@ -1,0 +1,70 @@
+{
+  "id": "age-calc-invalid-birthdate",
+  "name": "보험 나이 계산 - 잘못된 생년월일 입력",
+  "type": "test",
+  "requiresAuth": true,
+  "variables": ["baseUrl"],
+  "steps": [
+    {
+      "action": "loadState",
+      "description": "저장된 인증 상태 로드"
+    },
+    {
+      "action": "navigate",
+      "url": "{{baseUrl}}/age-calculation/input",
+      "description": "생년월일 입력 페이지로 이동"
+    },
+    {
+      "action": "screenshot",
+      "description": "입력 페이지 스크린샷"
+    },
+    {
+      "action": "fill",
+      "selector": "input",
+      "value": "19931301",
+      "description": "잘못된 생년월일 입력 (13월)"
+    },
+    {
+      "action": "expect",
+      "type": "visible",
+      "selector": ":text('올바른 생년월일')",
+      "description": "에러 메시지 '올바른 생년월일을 입력해 주세요' 노출 확인"
+    },
+    {
+      "action": "screenshot",
+      "description": "에러 메시지 스크린샷"
+    },
+    {
+      "action": "fill",
+      "selector": "input",
+      "value": "20010229",
+      "description": "존재하지 않는 날짜 입력 (2001년 2월 29일, 윤년 아님)"
+    },
+    {
+      "action": "expect",
+      "type": "visible",
+      "selector": ":text('올바른 생년월일')",
+      "description": "에러 메시지 재노출 확인"
+    },
+    {
+      "action": "screenshot",
+      "description": "윤년 에러 스크린샷"
+    },
+    {
+      "action": "fill",
+      "selector": "input",
+      "value": "19900101",
+      "description": "올바른 생년월일 입력으로 복구"
+    },
+    {
+      "action": "expect",
+      "type": "hidden",
+      "selector": ":text('올바른 생년월일')",
+      "description": "에러 메시지 사라짐 확인"
+    },
+    {
+      "action": "screenshot",
+      "description": "정상 입력 복구 스크린샷"
+    }
+  ]
+}
