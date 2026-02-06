@@ -4,6 +4,7 @@
   "type": "test",
   "requiresAuth": true,
   "variables": ["baseUrl"],
+  "description": "존재하지 않는 날짜(13월, 윤년 아닌 2/29 등)를 입력하고 blur 하면 에러 메시지가 표시되고, 올바른 값 입력 시 에러가 사라지는지 확인합니다.",
   "steps": [
     {
       "action": "loadState",
@@ -25,14 +26,19 @@
       "description": "잘못된 생년월일 입력 (13월)"
     },
     {
+      "action": "blur",
+      "selector": "input",
+      "description": "입력 필드에서 포커스 해제 (validation 트리거, onBlur → isTouched=true)"
+    },
+    {
       "action": "expect",
       "type": "visible",
-      "selector": ":text('올바른 생년월일')",
+      "selector": ":text('올바른 생년월일을 입력해 주세요')",
       "description": "에러 메시지 '올바른 생년월일을 입력해 주세요' 노출 확인"
     },
     {
       "action": "screenshot",
-      "description": "에러 메시지 스크린샷"
+      "description": "13월 에러 메시지 스크린샷"
     },
     {
       "action": "fill",
@@ -41,9 +47,14 @@
       "description": "존재하지 않는 날짜 입력 (2001년 2월 29일, 윤년 아님)"
     },
     {
+      "action": "blur",
+      "selector": "input",
+      "description": "입력 필드에서 포커스 해제 (validation 트리거)"
+    },
+    {
       "action": "expect",
       "type": "visible",
-      "selector": ":text('올바른 생년월일')",
+      "selector": ":text('올바른 생년월일을 입력해 주세요')",
       "description": "에러 메시지 재노출 확인"
     },
     {
@@ -57,9 +68,14 @@
       "description": "올바른 생년월일 입력으로 복구"
     },
     {
+      "action": "blur",
+      "selector": "input",
+      "description": "입력 필드에서 포커스 해제 (validation 트리거)"
+    },
+    {
       "action": "expect",
       "type": "hidden",
-      "selector": ":text('올바른 생년월일')",
+      "selector": ":text('올바른 생년월일을 입력해 주세요')",
       "description": "에러 메시지 사라짐 확인"
     },
     {
