@@ -53,10 +53,10 @@ AskUserQuestion으로 아래 정보를 **순서대로** 수집한다:
 
 #### 러너 위치 및 사용법
 
-스크립트는 `~/.claude/skills/instech-scenario-test/scripts/`에 설치되어 있다.
+**중요: 스크립트 경로는 반드시 `~/.claude/skills/instech-scenario-test/scripts/`이다. `/scripts` 하위 디렉토리를 빠뜨리지 말 것.**
 
 ```bash
-SCRIPTS=~/.claude/skills/instech-scenario-test/scripts
+SCRIPTS=~/.claude/skills/instech-scenario-test/scripts  # 반드시 /scripts 포함!
 
 # 전체 시나리오: 실행 + HTML 리포트 생성
 python3 $SCRIPTS/generate_report.py all <base_url> <auth_state_path> <feature_folder>
