@@ -26,7 +26,10 @@ URL: https://hj8902.github.io/instech_scenarios/scenarios/index.json
 AskUserQuestion으로 아래 정보를 **순서대로** 수집한다:
 
 #### 2-1. 테스트 URL + 로그인 옵션
-- 피쳐별 격리 환경 URL (예: `https://instech.dev.3o3.co.kr`, `https://feature-abc.dev.3o3.co.kr`)
+- 환경 선택지:
+  - 개발: `https://instech.dev.3o3.co.kr`
+  - 스테이징: `https://instech.stg.3o3.co.kr`
+  - 기타 (직접 입력): 피쳐 브랜치 환경 등 (예: `https://feature-abc.dev.3o3.co.kr`)
 - **새로 로그인** 옵션: 인증 상태 파일이 존재하더라도 강제로 재로그인할지 선택
   - "기존 로그인 유지" (기본값) — 저장된 인증 상태가 있으면 그대로 사용
   - "새로 로그인" — 기존 인증 상태를 삭제하고 headed 브라우저로 재로그인 진행
