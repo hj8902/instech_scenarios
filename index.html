@@ -259,6 +259,28 @@
     margin-bottom: 4px;
   }
 
+  /* Precondition */
+  .precondition {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    background: #fef3c7;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #92400e;
+    line-height: 1.5;
+  }
+  .precondition-icon {
+    flex-shrink: 0;
+    font-size: 14px;
+  }
+  .precondition-label {
+    font-weight: 600;
+    margin-right: 4px;
+  }
+
   /* Loading & Error */
   .loading {
     text-align: center;
@@ -499,6 +521,7 @@ function renderCard(s) {
         <span class="card-step-count">${stepCount}단계</span>
       </div>
       <div class="card-body">
+        ${s.precondition ? `<div class="precondition"><span class="precondition-icon">&#9888;</span><span><span class="precondition-label">전제조건:</span>${s.precondition}</span></div>` : ''}
         <div class="card-desc">${s.description || ''}</div>
         ${stepsHtml}
         ${varsHtml}
