@@ -1,9 +1,11 @@
 {
-  "id": "age-calc-landing-redirect",
-  "name": "보험 나이 계산 - Landing 리다이렉트",
+  "id": "age-calc-landing-to-input",
+  "name": "보험 나이 계산 - Landing → Input 리다이렉트 (신규 유저)",
   "type": "test",
   "requiresAuth": true,
   "variables": ["baseUrl"],
+  "precondition": "생년월일을 입력한 적 없는 상태 (신규 유저 또는 데이터 초기화 후)",
+  "description": "생년월일이 저장되지 않은 상태에서 Landing 페이지 접속 시 Input 페이지로 리다이렉트되는지 확인합니다.",
   "steps": [
     {
       "action": "loadState",
@@ -22,7 +24,7 @@
       "action": "expect",
       "type": "url",
       "value": "/age-calculation/input",
-      "description": "생년월일 미입력 시 Input 페이지로 리다이렉트되는지 확인"
+      "description": "Input 페이지(/age-calculation/input)로 리다이렉트되는지 확인"
     },
     {
       "action": "screenshot",

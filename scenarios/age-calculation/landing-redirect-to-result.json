@@ -1,0 +1,34 @@
+{
+  "id": "age-calc-landing-to-result",
+  "name": "보험 나이 계산 - Landing → Result 리다이렉트 (기존 유저)",
+  "type": "test",
+  "requiresAuth": true,
+  "variables": ["baseUrl"],
+  "precondition": "생년월일을 이미 입력한 상태 (기존 유저)",
+  "description": "생년월일이 이미 저장된 상태에서 Landing 페이지 접속 시 Result 페이지로 리다이렉트되는지 확인합니다.",
+  "steps": [
+    {
+      "action": "loadState",
+      "description": "저장된 인증 상태 로드"
+    },
+    {
+      "action": "navigate",
+      "url": "{{baseUrl}}/age-calculation/landing",
+      "description": "Landing 페이지로 이동"
+    },
+    {
+      "action": "waitForNavigation",
+      "description": "리다이렉트 대기"
+    },
+    {
+      "action": "expect",
+      "type": "url",
+      "value": "/age-calculation/result",
+      "description": "Result 페이지(/age-calculation/result)로 리다이렉트되는지 확인"
+    },
+    {
+      "action": "screenshot",
+      "description": "리다이렉트 결과 스크린샷"
+    }
+  ]
+}

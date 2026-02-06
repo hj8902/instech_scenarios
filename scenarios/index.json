@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "basePageUrl": "https://hj8902.github.io/instech_scenarios",
   "scenarios": [
     {
@@ -10,17 +10,25 @@
       "path": "_setup/login.json"
     },
     {
-      "id": "age-calc-landing-redirect",
-      "name": "보험 나이 계산 - Landing 리다이렉트",
-      "description": "Landing 페이지 접속 시 생년월일 유무에 따라 Input 또는 Result 페이지로 리다이렉트되는지 확인합니다.",
+      "id": "age-calc-landing-to-input",
+      "name": "보험 나이 계산 - Landing → Input 리다이렉트 (신규 유저)",
+      "description": "생년월일이 저장되지 않은 상태에서 Landing 페이지 접속 시 Input 페이지로 리다이렉트되는지 확인합니다.",
       "type": "test",
       "requiresAuth": true,
-      "path": "age-calculation/landing-redirect.json"
+      "path": "age-calculation/landing-redirect-to-input.json"
+    },
+    {
+      "id": "age-calc-landing-to-result",
+      "name": "보험 나이 계산 - Landing → Result 리다이렉트 (기존 유저)",
+      "description": "생년월일이 이미 저장된 상태에서 Landing 페이지 접속 시 Result 페이지로 리다이렉트되는지 확인합니다.",
+      "type": "test",
+      "requiresAuth": true,
+      "path": "age-calculation/landing-redirect-to-result.json"
     },
     {
       "id": "age-calc-input-to-result",
       "name": "보험 나이 계산 - 생년월일 입력 → 결과 확인",
-      "description": "생년월일 입력 후 보험나이, 다음 상령일, 보험료 비교 결과를 확인합니다.",
+      "description": "생년월일 입력 후 보험나이, 보험 나이 오르는 날, 보험료 비교 결과를 확인합니다.",
       "type": "test",
       "requiresAuth": true,
       "path": "age-calculation/input-to-result.json"
@@ -34,12 +42,20 @@
       "path": "age-calculation/invalid-birthdate.json"
     },
     {
-      "id": "age-calc-terms-masking",
-      "name": "보험 나이 계산 - 약관 미동의 시 마스킹",
-      "description": "결과 페이지에서 약관 동의 전에는 보험나이가 '??세'로 마스킹되고, 동의 후 실제 데이터가 표시되는지 확인합니다.",
+      "id": "age-calc-terms-masking-new",
+      "name": "보험 나이 계산 - 약관 미동의 시 마스킹 (신규 세션)",
+      "description": "약관 미동의 상태에서 결과 페이지 접속 시 보험나이가 '??'로 마스킹되고, 약관 동의 바텀시트가 노출되며, 동의 후 실제 데이터가 표시되는지 확인합니다.",
       "type": "test",
       "requiresAuth": true,
-      "path": "age-calculation/terms-masking.json"
+      "path": "age-calculation/terms-masking-new.json"
+    },
+    {
+      "id": "age-calc-terms-masking-agreed",
+      "name": "보험 나이 계산 - 약관 동의 후 결과 표시 (기존 세션)",
+      "description": "약관에 이미 동의한 상태에서 결과 페이지 접속 시 바텀시트 없이 실제 보험 나이가 바로 표시되는지 확인합니다.",
+      "type": "test",
+      "requiresAuth": true,
+      "path": "age-calculation/terms-masking-agreed.json"
     },
     {
       "id": "age-calc-edit-birthdate",

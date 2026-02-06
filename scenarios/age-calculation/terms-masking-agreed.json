@@ -1,0 +1,56 @@
+{
+  "id": "age-calc-terms-masking-agreed",
+  "name": "보험 나이 계산 - 약관 동의 후 결과 표시 (기존 세션)",
+  "type": "test",
+  "requiresAuth": true,
+  "variables": ["baseUrl"],
+  "precondition": "약관에 이미 동의한 상태 (기존 세션)",
+  "description": "약관에 이미 동의한 상태에서 결과 페이지 접속 시 바텀시트 없이 실제 보험 나이가 바로 표시되는지 확인합니다.",
+  "steps": [
+    {
+      "action": "loadState",
+      "description": "저장된 인증 상태 로드"
+    },
+    {
+      "action": "navigate",
+      "url": "{{baseUrl}}/age-calculation/result",
+      "description": "결과 페이지로 이동"
+    },
+    {
+      "action": "waitForNavigation",
+      "description": "페이지 로딩 대기"
+    },
+    {
+      "action": "screenshot",
+      "description": "결과 페이지 스크린샷"
+    },
+    {
+      "action": "expect",
+      "type": "hidden",
+      "selector": "[role='dialog'][aria-modal='true']",
+      "description": "약관 동의 바텀시트가 노출되지 않는지 확인"
+    },
+    {
+      "action": "expect",
+      "type": "hidden",
+      "selector": ":text('??')",
+      "description": "'??' 마스킹이 없는지 확인"
+    },
+    {
+      "action": "expect",
+      "type": "visible",
+      "selector": ":text('세')",
+      "description": "실제 보험 나이가 바로 표시되는지 확인"
+    },
+    {
+      "action": "expect",
+      "type": "visible",
+      "selector": ":text('보험 나이 오르는 날')",
+      "description": "보험 나이 오르는 날 정보가 표시되는지 확인"
+    },
+    {
+      "action": "screenshot",
+      "description": "최종 결과 스크린샷"
+    }
+  ]
+}
