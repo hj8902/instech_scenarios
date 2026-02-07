@@ -22,6 +22,7 @@
     --text-lighter: #9ca3af;
     --bg: #f9fafb;
     --white: #ffffff;
+    --sidebar-w: 260px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -31,214 +32,174 @@
     line-height: 1.6;
   }
 
-  /* Header */
-  .header {
+  /* ── Layout ── */
+  .layout {
+    display: flex;
+    height: 100vh;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
     background: var(--white);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .sidebar-header {
+    padding: 20px 16px 12px;
     border-bottom: 1px solid var(--border);
-    padding: 24px 0;
   }
-  .header-inner {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 24px;
-  }
-  .header h1 {
-    font-size: 22px;
+  .sidebar-header h1 {
+    font-size: 16px;
     font-weight: 700;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
   }
-  .header p {
-    font-size: 14px;
-    color: var(--text-light);
-  }
-  .header-meta {
+  .sidebar-meta {
     display: flex;
-    gap: 16px;
-    margin-top: 12px;
-    font-size: 13px;
-    color: var(--text-lighter);
-  }
-  .header-meta span {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  /* Main */
-  .main {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 24px;
-  }
-
-  /* === 대분류 (Major) === */
-  .major-section {
-    margin-bottom: 32px;
-  }
-  .major-header {
-    display: flex;
-    align-items: center;
     gap: 10px;
-    padding: 14px 16px;
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 12px;
+    font-size: 11px;
+    color: var(--text-lighter);
+    margin-top: 6px;
+  }
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+
+  /* Nav items */
+  .nav-group {
+    margin-bottom: 2px;
+  }
+  .nav-feature {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
     cursor: pointer;
     user-select: none;
-    transition: box-shadow 0.15s;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    transition: background 0.1s;
+    border-left: 3px solid transparent;
   }
-  .major-header:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  .nav-feature:hover {
+    background: var(--bg);
   }
-  .major-arrow {
-    font-size: 12px;
+  .nav-feature.active {
+    background: var(--primary-bg);
+    border-left-color: var(--primary);
+    color: var(--primary);
+  }
+  .nav-arrow {
+    font-size: 9px;
     color: var(--text-lighter);
     transition: transform 0.2s;
+    width: 12px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .nav-group.open > .nav-feature .nav-arrow {
+    transform: rotate(90deg);
+  }
+  .nav-feature .nav-icon {
+    font-size: 14px;
     flex-shrink: 0;
     width: 18px;
     text-align: center;
   }
-  .major-section.open > .major-header .major-arrow {
-    transform: rotate(90deg);
-  }
-  .major-title {
-    font-size: 16px;
-    font-weight: 700;
-    flex: 1;
-  }
-  .major-count {
-    font-size: 13px;
+  .nav-feature-label { flex: 1; }
+  .nav-count {
+    font-size: 11px;
+    font-weight: 500;
     color: var(--text-lighter);
-    flex-shrink: 0;
-  }
-  .major-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 3px 10px;
+    background: var(--bg);
+    padding: 1px 7px;
     border-radius: 999px;
-    font-size: 11px;
-    font-weight: 600;
     flex-shrink: 0;
   }
-  .major-badge.setup { background: var(--setup-bg); color: var(--setup); }
-  .major-badge.test { background: var(--primary-bg); color: var(--primary); }
-  .major-body {
-    display: none;
-    padding: 0 0 0 20px;
-    margin-top: 8px;
-  }
-  .major-section.open > .major-body {
-    display: block;
+  .nav-feature.active .nav-count {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
   }
 
-  /* === 중분류 (Mid) === */
-  .mid-section {
-    margin-bottom: 16px;
-  }
-  .mid-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    cursor: pointer;
-    user-select: none;
-    transition: box-shadow 0.15s;
-  }
-  .mid-header:hover {
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-  }
-  .mid-arrow {
-    font-size: 11px;
-    color: var(--text-lighter);
-    transition: transform 0.2s;
-    flex-shrink: 0;
-    width: 16px;
-    text-align: center;
-  }
-  .mid-section.open > .mid-header .mid-arrow {
-    transform: rotate(90deg);
-  }
-  .mid-title {
-    font-size: 15px;
-    font-weight: 600;
-    flex: 1;
-  }
-  .mid-count {
-    font-size: 12px;
-    color: var(--text-lighter);
-    flex-shrink: 0;
-  }
-  .mid-body {
+  .nav-children {
     display: none;
-    padding: 0 0 0 16px;
-    margin-top: 6px;
   }
-  .mid-section.open > .mid-body {
+  .nav-group.open > .nav-children {
     display: block;
   }
-
-  /* === 소분류 (Minor) === */
-  .minor-section {
-    margin-bottom: 10px;
-  }
-  .minor-header {
+  .nav-cat {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 12px;
+    padding: 6px 16px 6px 40px;
     cursor: pointer;
     user-select: none;
-    border-radius: 8px;
-  }
-  .minor-header:hover {
-    background: #f3f4f6;
-  }
-  .minor-arrow {
-    font-size: 10px;
-    color: var(--text-lighter);
-    transition: transform 0.2s;
-    flex-shrink: 0;
-    width: 14px;
-    text-align: center;
-  }
-  .minor-section.open > .minor-header .minor-arrow {
-    transform: rotate(90deg);
-  }
-  .minor-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 600;
-    flex-shrink: 0;
-  }
-  .minor-badge.happy { background: var(--happy-bg); color: var(--happy); }
-  .minor-badge.edge { background: var(--edge-bg); color: var(--edge); }
-  .minor-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-light);
-    flex: 1;
-  }
-  .minor-count {
     font-size: 12px;
+    color: var(--text-light);
+    transition: background 0.1s;
+    border-left: 3px solid transparent;
+  }
+  .nav-cat:hover {
+    background: var(--bg);
+  }
+  .nav-cat.active {
+    background: var(--primary-bg);
+    border-left-color: var(--primary);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .nav-cat-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .nav-cat-dot.happy { background: var(--happy); }
+  .nav-cat-dot.edge { background: var(--edge); }
+  .nav-cat-label { flex: 1; }
+  .nav-cat-count {
+    font-size: 11px;
     color: var(--text-lighter);
     flex-shrink: 0;
   }
-  .minor-body {
-    display: none;
-    padding: 0 0 0 12px;
-    margin-top: 4px;
-  }
-  .minor-section.open > .minor-body {
-    display: block;
+  .nav-cat.active .nav-cat-count {
+    color: var(--primary);
   }
 
-  /* === Scenario Card === */
+  /* ── Content ── */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 32px;
+    min-width: 0;
+  }
+
+  /* Content header */
+  .content-header {
+    margin-bottom: 20px;
+  }
+  .content-breadcrumb {
+    font-size: 12px;
+    color: var(--text-lighter);
+    margin-bottom: 4px;
+  }
+  .content-title {
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .content-count {
+    font-size: 13px;
+    color: var(--text-lighter);
+    margin-top: 2px;
+  }
+
+  /* ── Scenario Card ── */
   .card {
     background: var(--white);
     border: 1px solid var(--border);
@@ -272,8 +233,6 @@
   .card.open .card-arrow {
     transform: rotate(90deg);
   }
-
-  /* Badge */
   .badge {
     display: inline-flex;
     align-items: center;
@@ -287,6 +246,8 @@
   .badge.setup { background: var(--setup-bg); color: var(--setup); }
   .badge.test { background: var(--test-bg); color: var(--test); }
   .badge.auth { background: #fef3c7; color: #92400e; }
+  .badge.happy { background: var(--happy-bg); color: var(--happy); }
+  .badge.edge { background: var(--edge-bg); color: var(--edge); }
 
   .card-title {
     font-size: 14px;
@@ -449,62 +410,72 @@
     margin: 0 auto 12px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-
   .error {
     text-align: center;
     padding: 60px 20px;
     color: #ef4444;
   }
 
-  /* Footer */
-  .footer {
+  /* Empty state */
+  .empty {
     text-align: center;
-    font-size: 12px;
+    padding: 80px 20px;
     color: var(--text-lighter);
-    padding: 24px;
-    margin-top: 16px;
+    font-size: 14px;
   }
 
-  @media (max-width: 640px) {
-    .header-inner, .main { padding: 0 16px; }
-    .main { padding-top: 16px; }
-    .header-meta { flex-wrap: wrap; gap: 8px; }
-    .major-body { padding-left: 12px; }
-    .mid-body { padding-left: 8px; }
-    .minor-body { padding-left: 4px; }
+  /* Footer */
+  .footer {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-lighter);
+    flex-shrink: 0;
   }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="header-inner">
-    <h1>instech 시나리오 테스트 목록</h1>
-    <p>기능별 E2E 테스트 시나리오를 계층 구조로 확인할 수 있습니다.</p>
-    <div class="header-meta">
-      <span id="meta-version"></span>
-      <span id="meta-count"></span>
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1>instech 시나리오</h1>
+      <div class="sidebar-meta">
+        <span id="meta-version"></span>
+        <span id="meta-count"></span>
+      </div>
     </div>
-  </div>
-</div>
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <div class="loading">
+        <div class="spinner"></div>
+      </div>
+    </nav>
+    <div class="footer">
+      Claude Code (instech-scenario-test skill)로 실행
+    </div>
+  </aside>
 
-<div class="main" id="content">
-  <div class="loading">
-    <div class="spinner"></div>
-    <div>시나리오를 불러오는 중...</div>
-  </div>
-</div>
-
-<div class="footer">
-  instech 시나리오 테스트 &middot; Claude Code (instech-scenario-test skill)로 실행
+  <!-- Content -->
+  <main class="content" id="content">
+    <div class="empty">좌측 메뉴에서 시나리오를 선택하세요.</div>
+  </main>
 </div>
 
 <script>
 const BASE = 'https://hj8902.github.io/instech_scenarios/scenarios';
 
 const FEATURE_LABELS = {
+  '_setup': '사전설정',
   'age-calculation': '보험나이',
   'counsel': '보험상담',
+};
+
+const FEATURE_ICONS = {
+  '_setup': '&#9881;',
+  'age-calculation': '&#128197;',
+  'counsel': '&#128172;',
 };
 
 const CATEGORY_LABELS = {
@@ -515,67 +486,39 @@ const CATEGORY_LABELS = {
 const CATEGORY_ORDER = ['happy', 'edge'];
 
 const ACTION_LABELS = {
-  navigate: '이동',
-  fill: '입력',
-  click: '클릭',
-  clear: '삭제',
-  blur: '포커스해제',
-  waitFor: '대기',
-  waitForNavigation: '대기',
-  waitForResponse: '대기',
-  waitForTimeout: '대기',
-  waitForUrl: '대기',
-  expect: '검증',
-  screenshot: '캡처',
-  loadState: '상태로드',
-  saveState: '상태저장',
-  launchBrowser: '브라우저',
-  manualAction: '수동',
-  handleTermsAgreement: '약관동의',
-  injectStoreData: '스토어주입',
-  fetchAndInjectUserInfo: '유저정보주입',
-  setSessionStorage: '세션저장',
+  navigate: '이동', fill: '입력', click: '클릭', clear: '삭제',
+  blur: '포커스해제', waitFor: '대기', waitForNavigation: '대기',
+  waitForResponse: '대기', waitForTimeout: '대기', waitForUrl: '대기',
+  expect: '검증', screenshot: '캡처', loadState: '상태로드',
+  saveState: '상태저장', launchBrowser: '브라우저', manualAction: '수동',
+  handleTermsAgreement: '약관동의', injectStoreData: '스토어주입',
+  fetchAndInjectUserInfo: '유저정보주입', setSessionStorage: '세션저장',
 };
 
 const ACTION_TAG_CLASS = {
-  navigate: 'navigate',
-  fill: 'fill',
-  click: 'click',
-  clear: 'fill',
-  blur: 'blur',
-  waitFor: 'wait',
-  waitForNavigation: 'wait',
-  waitForResponse: 'wait',
-  waitForTimeout: 'wait',
-  waitForUrl: 'wait',
-  expect: 'expect',
-  screenshot: 'screenshot',
-  loadState: 'state',
-  saveState: 'state',
-  launchBrowser: 'navigate',
-  manualAction: 'manual',
-  handleTermsAgreement: 'terms',
-  injectStoreData: 'store',
-  fetchAndInjectUserInfo: 'store',
-  setSessionStorage: 'state',
+  navigate: 'navigate', fill: 'fill', click: 'click', clear: 'fill',
+  blur: 'blur', waitFor: 'wait', waitForNavigation: 'wait',
+  waitForResponse: 'wait', waitForTimeout: 'wait', waitForUrl: 'wait',
+  expect: 'expect', screenshot: 'screenshot', loadState: 'state',
+  saveState: 'state', launchBrowser: 'navigate', manualAction: 'manual',
+  handleTermsAgreement: 'terms', injectStoreData: 'store',
+  fetchAndInjectUserInfo: 'store', setSessionStorage: 'state',
 };
 
 const STEP_TYPE = {
-  navigate: 'action',
-  fill: 'action',
-  click: 'action',
-  clear: 'action',
-  blur: 'action',
-  expect: 'check',
-  screenshot: 'screenshot',
-  manualAction: 'manual',
-  handleTermsAgreement: 'action',
-  injectStoreData: 'action',
-  fetchAndInjectUserInfo: 'action',
+  navigate: 'action', fill: 'action', click: 'action', clear: 'action',
+  blur: 'action', expect: 'check', screenshot: 'screenshot',
+  manualAction: 'manual', handleTermsAgreement: 'action',
+  injectStoreData: 'action', fetchAndInjectUserInfo: 'action',
   setSessionStorage: 'action',
 };
 
+// ── State ──
+let allScenarios = [];
+let featureMap = {};  // folder -> scenarios[]
+
 async function load() {
+  const nav = document.getElementById('sidebar-nav');
   const content = document.getElementById('content');
 
   try {
@@ -584,10 +527,9 @@ async function load() {
     const index = await indexRes.json();
 
     document.getElementById('meta-version').textContent = `v${index.version}`;
-    document.getElementById('meta-count').textContent = `${index.scenarios.length}개 시나리오`;
+    document.getElementById('meta-count').textContent = `${index.scenarios.length}개`;
 
-    // Fetch all scenario details
-    const scenarios = await Promise.all(
+    allScenarios = await Promise.all(
       index.scenarios.map(async (s) => {
         try {
           const res = await fetch(`${BASE}/${s.path}`);
@@ -600,117 +542,162 @@ async function load() {
       })
     );
 
-    // 대분류 분리: 사전설정 vs 기능 테스트
-    const setup = scenarios.filter(s => s.type === 'setup');
-    const tests = scenarios.filter(s => s.type === 'test');
-
-    let html = '';
-
-    // ─── 대분류: 사전설정 ───
-    if (setup.length > 0) {
-      html += `
-        <div class="major-section open">
-          <div class="major-header" onclick="toggleSection(this)">
-            <span class="major-arrow">&#9654;</span>
-            <span class="major-badge setup">사전설정</span>
-            <span class="major-title">사전설정 (로그인)</span>
-            <span class="major-count">${setup.length}개</span>
-          </div>
-          <div class="major-body">`;
-      setup.forEach(s => { html += renderCard(s); });
-      html += '</div></div>';
-    }
-
-    // ─── 대분류: 기능 테스트 ───
-    // 중분류 그룹핑 (폴더 기준)
-    const featureGroups = {};
-    tests.forEach(s => {
-      const folder = s.path.split('/')[0] || 'etc';
-      if (!featureGroups[folder]) featureGroups[folder] = [];
-      featureGroups[folder].push(s);
+    // Group by folder
+    featureMap = {};
+    allScenarios.forEach(s => {
+      const folder = s.path.split('/')[0] || '_etc';
+      if (!featureMap[folder]) featureMap[folder] = [];
+      featureMap[folder].push(s);
     });
 
-    const totalTests = tests.length;
+    renderNav();
+
+    // Select first item by default
+    const firstNavItem = nav.querySelector('.nav-feature');
+    if (firstNavItem) firstNavItem.click();
+
+  } catch (e) {
+    nav.innerHTML = '';
+    content.innerHTML = `<div class="error"><p>로드 실패</p><p style="font-size:13px;margin-top:8px">${e.message}</p></div>`;
+  }
+}
+
+function renderNav() {
+  const nav = document.getElementById('sidebar-nav');
+  let html = '';
+
+  Object.entries(featureMap).forEach(([folder, scenarios]) => {
+    const label = FEATURE_LABELS[folder] || folder;
+    const icon = FEATURE_ICONS[folder] || '&#128196;';
+    const total = scenarios.length;
+
+    // Category breakdown
+    const catGroups = {};
+    scenarios.forEach(s => {
+      const cat = s.category || (s.type === 'setup' ? null : 'happy');
+      if (cat) {
+        if (!catGroups[cat]) catGroups[cat] = [];
+        catGroups[cat].push(s);
+      }
+    });
+
+    const hasCats = Object.keys(catGroups).length > 0;
+    const isSetup = folder === '_setup';
+
+    html += `<div class="nav-group${hasCats && !isSetup ? ' open' : ''}" data-folder="${folder}">`;
     html += `
-      <div class="major-section open">
-        <div class="major-header" onclick="toggleSection(this)">
-          <span class="major-arrow">&#9654;</span>
-          <span class="major-badge test">기능 테스트</span>
-          <span class="major-title">기능 테스트</span>
-          <span class="major-count">${totalTests}개</span>
-        </div>
-        <div class="major-body">`;
+      <div class="nav-feature" data-folder="${folder}" data-cat="" onclick="onNavClick(this)">
+        ${hasCats && !isSetup ? '<span class="nav-arrow">&#9654;</span>' : '<span style="width:12px"></span>'}
+        <span class="nav-icon">${icon}</span>
+        <span class="nav-feature-label">${label}</span>
+        <span class="nav-count">${total}</span>
+      </div>`;
 
-    // 중분류별 렌더링
-    Object.entries(featureGroups).forEach(([folder, featureScenarios]) => {
-      const featureLabel = FEATURE_LABELS[folder] || folder;
+    if (hasCats && !isSetup) {
+      html += '<div class="nav-children">';
+      CATEGORY_ORDER.forEach(cat => {
+        if (!catGroups[cat]) return;
+        html += `
+          <div class="nav-cat" data-folder="${folder}" data-cat="${cat}" onclick="onNavClick(this)">
+            <span class="nav-cat-dot ${cat}"></span>
+            <span class="nav-cat-label">${CATEGORY_LABELS[cat]}</span>
+            <span class="nav-cat-count">${catGroups[cat].length}</span>
+          </div>`;
+      });
+      html += '</div>';
+    }
 
-      // 소분류 그룹핑 (category 기준)
+    html += '</div>';
+  });
+
+  nav.innerHTML = html;
+
+  // Toggle children on arrow click
+  nav.querySelectorAll('.nav-feature').forEach(el => {
+    el.addEventListener('click', (e) => {
+      const group = el.closest('.nav-group');
+      if (group.querySelector('.nav-children')) {
+        group.classList.toggle('open');
+      }
+    });
+  });
+}
+
+function onNavClick(el) {
+  // Update active state
+  document.querySelectorAll('.nav-feature, .nav-cat').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+
+  const folder = el.dataset.folder;
+  const cat = el.dataset.cat;
+
+  let scenarios = featureMap[folder] || [];
+  if (cat) {
+    scenarios = scenarios.filter(s => (s.category || 'happy') === cat);
+  }
+
+  const featureLabel = FEATURE_LABELS[folder] || folder;
+  const catLabel = cat ? CATEGORY_LABELS[cat] : '';
+  const breadcrumb = cat ? `${featureLabel}` : '';
+  const title = cat ? `${featureLabel} — ${catLabel}` : featureLabel;
+
+  renderContent(scenarios, title, breadcrumb, cat);
+}
+
+function renderContent(scenarios, title, breadcrumb, filterCat) {
+  const content = document.getElementById('content');
+
+  let html = `
+    <div class="content-header">
+      ${breadcrumb ? `<div class="content-breadcrumb">${breadcrumb}</div>` : ''}
+      <div class="content-title">${title}</div>
+      <div class="content-count">${scenarios.length}개 시나리오</div>
+    </div>`;
+
+  if (scenarios.length === 0) {
+    html += '<div class="empty">해당하는 시나리오가 없습니다.</div>';
+  } else {
+    // If showing all categories (no filter), group by category
+    if (!filterCat) {
       const catGroups = {};
-      featureScenarios.forEach(s => {
-        const cat = s.category || 'happy';
+      scenarios.forEach(s => {
+        const cat = s.category || (s.type === 'setup' ? 'setup' : 'happy');
         if (!catGroups[cat]) catGroups[cat] = [];
         catGroups[cat].push(s);
       });
 
-      html += `
-        <div class="mid-section open">
-          <div class="mid-header" onclick="toggleSection(this)">
-            <span class="mid-arrow">&#9654;</span>
-            <span class="mid-title">${featureLabel}</span>
-            <span class="mid-count">${featureScenarios.length}개</span>
-          </div>
-          <div class="mid-body">`;
-
-      // 소분류 순서: happy → edge
-      CATEGORY_ORDER.forEach(cat => {
-        if (!catGroups[cat]) return;
-        const catScenarios = catGroups[cat];
-        const catLabel = CATEGORY_LABELS[cat] || cat;
-        const badgeClass = cat;
-
-        html += `
-          <div class="minor-section open">
-            <div class="minor-header" onclick="toggleSection(this)">
-              <span class="minor-arrow">&#9654;</span>
-              <span class="minor-badge ${badgeClass}">${catLabel}</span>
-              <span class="minor-title"></span>
-              <span class="minor-count">${catScenarios.length}개</span>
-            </div>
-            <div class="minor-body">`;
-        catScenarios.forEach(s => { html += renderCard(s); });
-        html += '</div></div>';
+      const order = s => s.type === 'setup' ? ['setup'] : CATEGORY_ORDER;
+      const cats = Object.keys(catGroups).sort((a, b) => {
+        const idx = ['setup', ...CATEGORY_ORDER];
+        return idx.indexOf(a) - idx.indexOf(b);
       });
 
-      html += '</div></div>';
-    });
-
-    html += '</div></div>';
-
-    content.innerHTML = html;
-
-    // Card toggle handlers
-    content.querySelectorAll('.card-header').forEach(h => {
-      h.addEventListener('click', (e) => {
-        e.stopPropagation();
-        h.parentElement.classList.toggle('open');
+      cats.forEach(cat => {
+        catGroups[cat].forEach(s => { html += renderCard(s, true); });
       });
-    });
-
-  } catch (e) {
-    content.innerHTML = `<div class="error"><p>시나리오를 불러오지 못했습니다.</p><p style="font-size:13px;margin-top:8px">${e.message}</p></div>`;
+    } else {
+      scenarios.forEach(s => { html += renderCard(s, false); });
+    }
   }
+
+  content.innerHTML = html;
+
+  // Card toggle handlers
+  content.querySelectorAll('.card-header').forEach(h => {
+    h.addEventListener('click', () => {
+      h.parentElement.classList.toggle('open');
+    });
+  });
 }
 
-function toggleSection(header) {
-  header.parentElement.classList.toggle('open');
-}
-
-function renderCard(s) {
+function renderCard(s, showCategoryBadge) {
   const typeBadge = s.type === 'setup'
     ? '<span class="badge setup">사전설정</span>'
-    : '<span class="badge test">테스트</span>';
+    : '';
   const authBadge = s.requiresAuth ? '<span class="badge auth">로그인 필요</span>' : '';
+  const catBadge = showCategoryBadge && s.category
+    ? `<span class="badge ${s.category}">${CATEGORY_LABELS[s.category]}</span>`
+    : '';
   const stepCount = s.steps ? s.steps.length : 0;
 
   let stepsHtml = '';
@@ -752,6 +739,7 @@ function renderCard(s) {
       <div class="card-header">
         <span class="card-arrow">&#9654;</span>
         ${typeBadge}
+        ${catBadge}
         ${authBadge}
         <span class="card-title">${s.name}</span>
         <span class="card-step-count">${stepCount}단계</span>
