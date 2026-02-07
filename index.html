@@ -12,6 +12,10 @@
     --setup-bg: #f5f3ff;
     --test: #059669;
     --test-bg: #ecfdf5;
+    --happy: #059669;
+    --happy-bg: #ecfdf5;
+    --edge: #d97706;
+    --edge-bg: #fffbeb;
     --border: #e5e7eb;
     --text: #1f2937;
     --text-light: #6b7280;
@@ -67,49 +71,202 @@
     padding: 24px;
   }
 
-  /* Category */
-  .category {
+  /* === 대분류 (Major) === */
+  .major-section {
     margin-bottom: 32px;
   }
-  .category-title {
-    font-size: 13px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-lighter);
-    margin-bottom: 12px;
-    padding-left: 4px;
-  }
-
-  /* Scenario Card */
-  .card {
+  .major-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: 12px;
-    margin-bottom: 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: box-shadow 0.15s;
+  }
+  .major-header:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .major-arrow {
+    font-size: 12px;
+    color: var(--text-lighter);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+    width: 18px;
+    text-align: center;
+  }
+  .major-section.open > .major-header .major-arrow {
+    transform: rotate(90deg);
+  }
+  .major-title {
+    font-size: 16px;
+    font-weight: 700;
+    flex: 1;
+  }
+  .major-count {
+    font-size: 13px;
+    color: var(--text-lighter);
+    flex-shrink: 0;
+  }
+  .major-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .major-badge.setup { background: var(--setup-bg); color: var(--setup); }
+  .major-badge.test { background: var(--primary-bg); color: var(--primary); }
+  .major-body {
+    display: none;
+    padding: 0 0 0 20px;
+    margin-top: 8px;
+  }
+  .major-section.open > .major-body {
+    display: block;
+  }
+
+  /* === 중분류 (Mid) === */
+  .mid-section {
+    margin-bottom: 16px;
+  }
+  .mid-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    user-select: none;
+    transition: box-shadow 0.15s;
+  }
+  .mid-header:hover {
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .mid-arrow {
+    font-size: 11px;
+    color: var(--text-lighter);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+    width: 16px;
+    text-align: center;
+  }
+  .mid-section.open > .mid-header .mid-arrow {
+    transform: rotate(90deg);
+  }
+  .mid-title {
+    font-size: 15px;
+    font-weight: 600;
+    flex: 1;
+  }
+  .mid-count {
+    font-size: 12px;
+    color: var(--text-lighter);
+    flex-shrink: 0;
+  }
+  .mid-body {
+    display: none;
+    padding: 0 0 0 16px;
+    margin-top: 6px;
+  }
+  .mid-section.open > .mid-body {
+    display: block;
+  }
+
+  /* === 소분류 (Minor) === */
+  .minor-section {
+    margin-bottom: 10px;
+  }
+  .minor-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 8px;
+  }
+  .minor-header:hover {
+    background: #f3f4f6;
+  }
+  .minor-arrow {
+    font-size: 10px;
+    color: var(--text-lighter);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+    width: 14px;
+    text-align: center;
+  }
+  .minor-section.open > .minor-header .minor-arrow {
+    transform: rotate(90deg);
+  }
+  .minor-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .minor-badge.happy { background: var(--happy-bg); color: var(--happy); }
+  .minor-badge.edge { background: var(--edge-bg); color: var(--edge); }
+  .minor-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-light);
+    flex: 1;
+  }
+  .minor-count {
+    font-size: 12px;
+    color: var(--text-lighter);
+    flex-shrink: 0;
+  }
+  .minor-body {
+    display: none;
+    padding: 0 0 0 12px;
+    margin-top: 4px;
+  }
+  .minor-section.open > .minor-body {
+    display: block;
+  }
+
+  /* === Scenario Card === */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 8px;
     overflow: hidden;
     transition: box-shadow 0.15s;
   }
   .card:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
   }
   .card-header {
-    padding: 16px 20px;
+    padding: 12px 16px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     user-select: none;
   }
   .card-header:hover {
     background: var(--bg);
   }
   .card-arrow {
-    font-size: 11px;
+    font-size: 10px;
     color: var(--text-lighter);
     transition: transform 0.2s;
     flex-shrink: 0;
-    width: 16px;
+    width: 14px;
     text-align: center;
   }
   .card.open .card-arrow {
@@ -120,19 +277,19 @@
   .badge {
     display: inline-flex;
     align-items: center;
-    padding: 3px 10px;
+    padding: 2px 8px;
     border-radius: 999px;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     flex-shrink: 0;
     white-space: nowrap;
   }
   .badge.setup { background: var(--setup-bg); color: var(--setup); }
   .badge.test { background: var(--test-bg); color: var(--test); }
-  .badge.auth { background: #fef3c7; color: #92400e; font-size: 10px; }
+  .badge.auth { background: #fef3c7; color: #92400e; }
 
   .card-title {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     flex: 1;
   }
@@ -146,26 +303,26 @@
   .card-body {
     display: none;
     border-top: 1px solid var(--border);
-    padding: 16px 20px;
+    padding: 14px 16px;
   }
   .card.open .card-body {
     display: block;
   }
   .card-desc {
-    font-size: 14px;
+    font-size: 13px;
     color: var(--text-light);
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     line-height: 1.7;
   }
 
   /* Steps */
   .steps-title {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     color: var(--text-lighter);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
   .step-list {
     list-style: none;
@@ -183,20 +340,20 @@
   .step-item {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
-    padding: 6px 0;
+    gap: 10px;
+    padding: 5px 0;
     position: relative;
   }
   .step-dot {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     background: var(--white);
     border: 2px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     color: var(--text-light);
     flex-shrink: 0;
@@ -212,7 +369,7 @@
     padding-top: 2px;
   }
   .step-desc {
-    font-size: 14px;
+    font-size: 13px;
   }
   .step-action-tag {
     display: inline-block;
@@ -220,7 +377,7 @@
     font-weight: 600;
     padding: 1px 6px;
     border-radius: 4px;
-    margin-right: 6px;
+    margin-right: 4px;
     vertical-align: middle;
   }
   .step-action-tag.navigate { background: #dbeafe; color: #1e40af; }
@@ -233,29 +390,30 @@
   .step-action-tag.manual { background: #fff7ed; color: #c2410c; }
   .step-action-tag.terms { background: #ede9fe; color: #6d28d9; }
   .step-action-tag.state { background: #f0fdf4; color: #166534; }
+  .step-action-tag.store { background: #fdf2f8; color: #9d174d; }
 
   /* Variables */
   .variables {
-    margin-top: 12px;
-    padding-top: 12px;
+    margin-top: 10px;
+    padding-top: 10px;
     border-top: 1px solid #f3f4f6;
   }
   .variables-title {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     color: var(--text-lighter);
-    margin-bottom: 6px;
+    margin-bottom: 4px;
   }
   .var-chip {
     display: inline-flex;
     align-items: center;
     padding: 2px 8px;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 11px;
     font-family: 'SF Mono', 'Fira Code', monospace;
     background: #f3f4f6;
     color: var(--text-light);
-    margin-right: 6px;
+    margin-right: 4px;
     margin-bottom: 4px;
   }
 
@@ -265,21 +423,15 @@
     align-items: flex-start;
     gap: 6px;
     padding: 8px 12px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     background: #fef3c7;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 12px;
     color: #92400e;
     line-height: 1.5;
   }
-  .precondition-icon {
-    flex-shrink: 0;
-    font-size: 14px;
-  }
-  .precondition-label {
-    font-weight: 600;
-    margin-right: 4px;
-  }
+  .precondition-icon { flex-shrink: 0; font-size: 13px; }
+  .precondition-label { font-weight: 600; margin-right: 4px; }
 
   /* Loading & Error */
   .loading {
@@ -317,6 +469,9 @@
     .header-inner, .main { padding: 0 16px; }
     .main { padding-top: 16px; }
     .header-meta { flex-wrap: wrap; gap: 8px; }
+    .major-body { padding-left: 12px; }
+    .mid-body { padding-left: 8px; }
+    .minor-body { padding-left: 4px; }
   }
 </style>
 </head>
@@ -325,7 +480,7 @@
 <div class="header">
   <div class="header-inner">
     <h1>instech 시나리오 테스트 목록</h1>
-    <p>보험 나이 계산 등 주요 기능의 E2E 테스트 시나리오를 확인할 수 있습니다.</p>
+    <p>기능별 E2E 테스트 시나리오를 계층 구조로 확인할 수 있습니다.</p>
     <div class="header-meta">
       <span id="meta-version"></span>
       <span id="meta-count"></span>
@@ -347,6 +502,18 @@
 <script>
 const BASE = 'https://hj8902.github.io/instech_scenarios/scenarios';
 
+const FEATURE_LABELS = {
+  'age-calculation': '보험나이',
+  'counsel': '보험상담',
+};
+
+const CATEGORY_LABELS = {
+  happy: 'Happy Path',
+  edge: 'EdgeCase Path',
+};
+
+const CATEGORY_ORDER = ['happy', 'edge'];
+
 const ACTION_LABELS = {
   navigate: '이동',
   fill: '입력',
@@ -365,6 +532,9 @@ const ACTION_LABELS = {
   launchBrowser: '브라우저',
   manualAction: '수동',
   handleTermsAgreement: '약관동의',
+  injectStoreData: '스토어주입',
+  fetchAndInjectUserInfo: '유저정보주입',
+  setSessionStorage: '세션저장',
 };
 
 const ACTION_TAG_CLASS = {
@@ -385,6 +555,9 @@ const ACTION_TAG_CLASS = {
   launchBrowser: 'navigate',
   manualAction: 'manual',
   handleTermsAgreement: 'terms',
+  injectStoreData: 'store',
+  fetchAndInjectUserInfo: 'store',
+  setSessionStorage: 'state',
 };
 
 const STEP_TYPE = {
@@ -397,6 +570,9 @@ const STEP_TYPE = {
   screenshot: 'screenshot',
   manualAction: 'manual',
   handleTermsAgreement: 'action',
+  injectStoreData: 'action',
+  fetchAndInjectUserInfo: 'action',
+  setSessionStorage: 'action',
 };
 
 async function load() {
@@ -410,7 +586,7 @@ async function load() {
     document.getElementById('meta-version').textContent = `v${index.version}`;
     document.getElementById('meta-count').textContent = `${index.scenarios.length}개 시나리오`;
 
-    // Fetch all scenarios
+    // Fetch all scenario details
     const scenarios = await Promise.all(
       index.scenarios.map(async (s) => {
         try {
@@ -424,43 +600,99 @@ async function load() {
       })
     );
 
-    // Group by type
+    // 대분류 분리: 사전설정 vs 기능 테스트
     const setup = scenarios.filter(s => s.type === 'setup');
     const tests = scenarios.filter(s => s.type === 'test');
 
     let html = '';
 
+    // ─── 대분류: 사전설정 ───
     if (setup.length > 0) {
-      html += '<div class="category"><div class="category-title">사전 설정 (Setup)</div>';
+      html += `
+        <div class="major-section open">
+          <div class="major-header" onclick="toggleSection(this)">
+            <span class="major-arrow">&#9654;</span>
+            <span class="major-badge setup">사전설정</span>
+            <span class="major-title">사전설정 (로그인)</span>
+            <span class="major-count">${setup.length}개</span>
+          </div>
+          <div class="major-body">`;
       setup.forEach(s => { html += renderCard(s); });
-      html += '</div>';
+      html += '</div></div>';
     }
 
-    // Group tests by folder/feature
-    const groups = {};
+    // ─── 대분류: 기능 테스트 ───
+    // 중분류 그룹핑 (폴더 기준)
+    const featureGroups = {};
     tests.forEach(s => {
-      const folder = s.path.split('/')[0] || '기타';
-      const label = folder.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-      if (!groups[folder]) groups[folder] = { label, scenarios: [] };
-      groups[folder].scenarios.push(s);
+      const folder = s.path.split('/')[0] || 'etc';
+      if (!featureGroups[folder]) featureGroups[folder] = [];
+      featureGroups[folder].push(s);
     });
 
-    const FEATURE_LABELS = {
-      'age-calculation': '보험 나이 계산',
-    };
+    const totalTests = tests.length;
+    html += `
+      <div class="major-section open">
+        <div class="major-header" onclick="toggleSection(this)">
+          <span class="major-arrow">&#9654;</span>
+          <span class="major-badge test">기능 테스트</span>
+          <span class="major-title">기능 테스트</span>
+          <span class="major-count">${totalTests}개</span>
+        </div>
+        <div class="major-body">`;
 
-    Object.entries(groups).forEach(([folder, group]) => {
-      const label = FEATURE_LABELS[folder] || group.label;
-      html += `<div class="category"><div class="category-title">${label} (${group.scenarios.length}개)</div>`;
-      group.scenarios.forEach(s => { html += renderCard(s); });
-      html += '</div>';
+    // 중분류별 렌더링
+    Object.entries(featureGroups).forEach(([folder, featureScenarios]) => {
+      const featureLabel = FEATURE_LABELS[folder] || folder;
+
+      // 소분류 그룹핑 (category 기준)
+      const catGroups = {};
+      featureScenarios.forEach(s => {
+        const cat = s.category || 'happy';
+        if (!catGroups[cat]) catGroups[cat] = [];
+        catGroups[cat].push(s);
+      });
+
+      html += `
+        <div class="mid-section open">
+          <div class="mid-header" onclick="toggleSection(this)">
+            <span class="mid-arrow">&#9654;</span>
+            <span class="mid-title">${featureLabel}</span>
+            <span class="mid-count">${featureScenarios.length}개</span>
+          </div>
+          <div class="mid-body">`;
+
+      // 소분류 순서: happy → edge
+      CATEGORY_ORDER.forEach(cat => {
+        if (!catGroups[cat]) return;
+        const catScenarios = catGroups[cat];
+        const catLabel = CATEGORY_LABELS[cat] || cat;
+        const badgeClass = cat;
+
+        html += `
+          <div class="minor-section open">
+            <div class="minor-header" onclick="toggleSection(this)">
+              <span class="minor-arrow">&#9654;</span>
+              <span class="minor-badge ${badgeClass}">${catLabel}</span>
+              <span class="minor-title"></span>
+              <span class="minor-count">${catScenarios.length}개</span>
+            </div>
+            <div class="minor-body">`;
+        catScenarios.forEach(s => { html += renderCard(s); });
+        html += '</div></div>';
+      });
+
+      html += '</div></div>';
     });
+
+    html += '</div></div>';
 
     content.innerHTML = html;
 
-    // Toggle handlers
+    // Card toggle handlers
     content.querySelectorAll('.card-header').forEach(h => {
-      h.addEventListener('click', () => {
+      h.addEventListener('click', (e) => {
+        e.stopPropagation();
         h.parentElement.classList.toggle('open');
       });
     });
@@ -468,6 +700,10 @@ async function load() {
   } catch (e) {
     content.innerHTML = `<div class="error"><p>시나리오를 불러오지 못했습니다.</p><p style="font-size:13px;margin-top:8px">${e.message}</p></div>`;
   }
+}
+
+function toggleSection(header) {
+  header.parentElement.classList.toggle('open');
 }
 
 function renderCard(s) {
