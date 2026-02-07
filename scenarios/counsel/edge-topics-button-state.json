@@ -43,7 +43,7 @@
     },
     {
       "action": "click",
-      "selector": "[role='checkbox']",
+      "selector": "input[type='checkbox']",
       "description": "첫 번째 주제 선택"
     },
     {
@@ -58,7 +58,7 @@
     },
     {
       "action": "click",
-      "selector": "[role='checkbox']",
+      "selector": "input[type='checkbox']",
       "description": "주제 선택 해제"
     },
     {
