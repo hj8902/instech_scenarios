@@ -148,6 +148,8 @@ with sync_playwright() as p:
 | `manualAction` | 사용자에게 안내 메시지 출력 후 다음 액션의 대기 조건 충족까지 대기 |
 | `waitForUrl` | `page.wait_for_url(pattern, timeout=timeout)` |
 | `handleTermsAgreement` | 약관 체크박스 탐색 후 클릭, 없으면 skip |
+| `injectStoreData` | `window.__${store}_STORE__?.setState(data)` — 비프로덕션 빌드에서 Zustand store에 데이터 주입 |
+| `setSessionStorage` | `sessionStorage.setItem(key, value)` |
 
 ### Step 4. 결과 보고
 

@@ -209,6 +209,23 @@ def execute_step(page, step, context):
         # 브라우저 재실행은 러너 레벨에서 처리
         return {"status": "pass", "desc": desc}
 
+    elif action == "injectStoreData":
+        store_name = step.get("store", "")
+        data = step.get("data", {})
+        data = substitute_variables(data, context.get("variables", {}))
+        window_key = f"__{ store_name.upper() }_STORE__"
+        js = f"window.{window_key}?.setState({json.dumps(data)})"
+        page.evaluate(js)
+        page.wait_for_timeout(300)
+        return {"status": "pass", "desc": desc}
+
+    elif action == "setSessionStorage":
+        key = step.get("key", "")
+        value = step.get("value", "")
+        value = substitute_variables(value, context.get("variables", {}))
+        page.evaluate(f"sessionStorage.setItem('{key}', '{value}')")
+        return {"status": "pass", "desc": desc}
+
     elif action == "manualAction":
         instruction = step.get("instruction", "")
         print(f"  [수동] {instruction}")
@@ -245,6 +262,7 @@ def run_scenario(browser, scenario, variables, auth_state_path, screenshot_prefi
         "screenshot_path": screenshot_prefix,
         "auth_state_path": auth_state_path,
         "browser_context": ctx,
+        "variables": variables,
     }
 
     results = []
