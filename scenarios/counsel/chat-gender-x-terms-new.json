@@ -158,7 +158,8 @@
     },
     {
       "action": "handleTermsAgreement",
-      "description": "약관 동의 바텀시트 처리"
+      "description": "약관 동의 바텀시트 처리",
+      "required": true
     },
     {
       "action": "waitForTimeout",

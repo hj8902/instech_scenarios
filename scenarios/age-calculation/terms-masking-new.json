@@ -3,7 +3,9 @@
   "name": "보험 나이 계산 - 약관 미동의 시 마스킹 (신규 세션)",
   "type": "test",
   "requiresAuth": true,
-  "variables": ["baseUrl"],
+  "variables": [
+    "baseUrl"
+  ],
   "precondition": "약관에 동의한 적 없는 상태 (신규 세션 또는 쿠키 초기화 후)",
   "description": "약관 미동의 상태에서 결과 페이지 접속 시 보험나이가 '??'로 마스킹되고, 약관 동의 바텀시트가 노출되며, 동의 후 실제 데이터가 표시되는지 확인합니다.",
   "steps": [
@@ -38,7 +40,8 @@
     },
     {
       "action": "handleTermsAgreement",
-      "description": "약관 동의 처리"
+      "description": "약관 동의 처리",
+      "required": true
     },
     {
       "action": "waitForTimeout",
