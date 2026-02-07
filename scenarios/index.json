@@ -92,7 +92,7 @@
     },
     {
       "id": "counsel-inperson-gender-x-terms-agreed",
-      "name": "대면 (유저 정보 없음, 약관 동의됨)",
+      "name": "대면 (성별 미입력, 약관 동의됨)",
       "description": "주제 선택 → 대면 상담 선택 → 지역/일정 선택 → 정보 수정 → 상담 신청 완료",
       "type": "test",
       "labels": ["happy-path", "inperson", "gender-x", "terms-agreed"],
@@ -101,7 +101,7 @@
     },
     {
       "id": "counsel-inperson-gender-x-terms-new",
-      "name": "대면 (유저 정보 없음, 약관 미동의)",
+      "name": "대면 (성별 미입력, 약관 미동의)",
       "description": "주제 선택 → 대면 상담 선택 → 지역/일정 선택 → 정보 수정 → 약관 동의 → 상담 신청 완료",
       "type": "test",
       "labels": ["happy-path", "inperson", "gender-x", "terms-new"],
@@ -128,7 +128,7 @@
     },
     {
       "id": "counsel-phone-gender-x-terms-agreed",
-      "name": "전화 (유저 정보 없음, 약관 동의됨)",
+      "name": "전화 (성별 미입력, 약관 동의됨)",
       "description": "주제 선택 → 전화 상담 선택 → 정보 수정 → 상담 신청 완료",
       "type": "test",
       "labels": ["happy-path", "phone", "gender-x", "terms-agreed"],
@@ -137,7 +137,7 @@
     },
     {
       "id": "counsel-phone-gender-x-terms-new",
-      "name": "전화 (유저 정보 없음, 약관 미동의)",
+      "name": "전화 (성별 미입력, 약관 미동의)",
       "description": "주제 선택 → 전화 상담 선택 → 정보 수정 → 약관 동의 → 상담 신청 완료",
       "type": "test",
       "labels": ["happy-path", "phone", "gender-x", "terms-new"],
@@ -164,7 +164,7 @@
     },
     {
       "id": "counsel-chat-gender-x-terms-agreed",
-      "name": "카카오톡 (유저 정보 없음, 약관 동의됨)",
+      "name": "카카오톡 (성별 미입력, 약관 동의됨)",
       "description": "주제 선택 → 카카오톡 상담 선택 → 정보 수정 → 상담 신청 완료",
       "type": "test",
       "labels": ["happy-path", "kakao", "gender-x", "terms-agreed"],
@@ -173,7 +173,7 @@
     },
     {
       "id": "counsel-chat-gender-x-terms-new",
-      "name": "카카오톡 (유저 정보 없음, 약관 미동의)",
+      "name": "카카오톡 (성별 미입력, 약관 미동의)",
       "description": "주제 선택 → 카카오톡 상담 선택 → 정보 수정 → 약관 동의 → 상담 신청 완료",
       "type": "test",
       "labels": ["happy-path", "kakao", "gender-x", "terms-new"],

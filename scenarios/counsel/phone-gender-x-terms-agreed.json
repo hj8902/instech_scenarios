@@ -1,11 +1,15 @@
 {
   "id": "counsel-phone-gender-x-terms-agreed",
-  "name": "상담 신청 - 전화 (유저 정보 없음, 약관 동의됨)",
+  "name": "상담 신청 - 전화 (성별 미입력, 약관 동의됨)",
   "type": "test",
   "requiresAuth": true,
   "variables": [
     "baseUrl",
-    "entryType"
+    "entryType",
+    "userId",
+    "userName",
+    "userPhone",
+    "userBirthDate"
   ],
   "defaults": {
     "entryType": "OTHER"
@@ -31,6 +35,18 @@
     {
       "action": "waitForNavigation",
       "description": "페이지 로딩 대기"
+    },
+    {
+      "action": "fetchAndInjectUserInfo",
+      "store": "COUNSEL",
+      "userData": {
+        "userId": "{{userId}}",
+        "name": "{{userName}}",
+        "phoneNumber": "{{userPhone}}",
+        "birthDate": "{{userBirthDate}}",
+        "gender": ""
+      },
+      "description": "유저 정보를 store에 주입 (gender X — 성별 미입력)"
     },
     {
       "action": "screenshot",
