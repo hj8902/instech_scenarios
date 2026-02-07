@@ -1,0 +1,113 @@
+{
+  "id": "counsel-edge-user-edit-name-validation",
+  "name": "이름 필드 유효성 검증 (한영 혼합, 자모)",
+  "type": "test",
+  "category": "edge",
+  "requiresAuth": true,
+  "variables": [
+    "baseUrl"
+  ],
+  "precondition": "유저 프로필에 성별 정보가 있는 상태",
+  "description": "정보 수정 → 한영 혼합 이름 → 에러 → 자모 이름 → 에러",
+  "steps": [
+    {
+      "action": "loadState",
+      "description": "저장된 인증 상태 로드"
+    },
+    {
+      "action": "navigate",
+      "url": "{{baseUrl}}/counsel/topics",
+      "description": "앱 로드"
+    },
+    {
+      "action": "waitForNavigation",
+      "description": "페이지 로딩 대기"
+    },
+    {
+      "action": "fetchAndInjectUserInfo",
+      "store": "COUNSEL",
+      "description": "유저 정보 주입"
+    },
+    {
+      "action": "setSessionStorage",
+      "key": "__instech_counsel_entry__",
+      "value": "OTHER",
+      "description": "EntryType 설정"
+    },
+    {
+      "action": "navigate",
+      "url": "{{baseUrl}}/counsel/user-edit/Phone",
+      "description": "정보 수정 페이지로 직접 이동 (Phone)"
+    },
+    {
+      "action": "waitForNavigation",
+      "description": "페이지 로딩 대기"
+    },
+    {
+      "action": "screenshot",
+      "description": "정보 수정 페이지 초기 상태"
+    },
+    {
+      "action": "fill",
+      "selector": "input[placeholder='이름']",
+      "value": "",
+      "description": "이름 필드 초기화"
+    },
+    {
+      "action": "fill",
+      "selector": "input[placeholder='이름']",
+      "value": "김John",
+      "description": "한영 혼합 이름 입력"
+    },
+    {
+      "action": "blur",
+      "selector": "input[placeholder='이름']",
+      "description": "이름 필드 blur"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 500
+    },
+    {
+      "action": "expect",
+      "type": "visible",
+      "selector": ":text('올바른 이름을 입력해 주세요'), :text('한글 또는 영문 이름을 입력해 주세요')",
+      "description": "한영 혼합 이름 에러 메시지 확인"
+    },
+    {
+      "action": "screenshot",
+      "description": "한영 혼합 이름 에러"
+    },
+    {
+      "action": "fill",
+      "selector": "input[placeholder='이름']",
+      "value": "",
+      "description": "이름 필드 초기화"
+    },
+    {
+      "action": "fill",
+      "selector": "input[placeholder='이름']",
+      "value": "김ㄱ",
+      "description": "자모 포함 이름 입력"
+    },
+    {
+      "action": "blur",
+      "selector": "input[placeholder='이름']",
+      "description": "이름 필드 blur"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 500
+    },
+    {
+      "action": "expect",
+      "type": "visible",
+      "selector": ":text('올바른 이름을 입력해 주세요'), :text('한글 또는 영문 이름을 입력해 주세요')",
+      "description": "자모 이름 에러 메시지 확인"
+    },
+    {
+      "action": "screenshot",
+      "description": "자모 이름 에러"
+    }
+  ]
+}

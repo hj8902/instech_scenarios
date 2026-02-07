@@ -1,0 +1,132 @@
+{
+  "id": "counsel-edge-types-terms-close-retry",
+  "name": "약관 바텀시트 닫기 후 재시도",
+  "type": "test",
+  "category": "edge",
+  "requiresAuth": true,
+  "variables": [
+    "baseUrl"
+  ],
+  "precondition": "상담 약관에 동의하지 않은 상태, 유저 프로필에 성별 정보가 있는 상태",
+  "description": "주제 선택 → 전화 → 확인 → 약관 바텀시트 닫기 → 다시 시도 → 바텀시트 재노출",
+  "steps": [
+    {
+      "action": "loadState",
+      "description": "저장된 인증 상태 로드"
+    },
+    {
+      "action": "navigate",
+      "url": "{{baseUrl}}/counsel/topics",
+      "description": "상담 주제 선택 페이지로 이동"
+    },
+    {
+      "action": "waitForNavigation",
+      "description": "페이지 로딩 대기"
+    },
+    {
+      "action": "fetchAndInjectUserInfo",
+      "store": "COUNSEL",
+      "description": "me API에서 유저 정보 주입"
+    },
+    {
+      "action": "setSessionStorage",
+      "key": "__instech_counsel_entry__",
+      "value": "OTHER",
+      "description": "EntryType 설정"
+    },
+    {
+      "action": "click",
+      "selector": "[role='checkbox']",
+      "description": "첫 번째 주제 선택"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 500
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text('다음')",
+      "description": "'다음' 클릭 (주제)"
+    },
+    {
+      "action": "waitForNavigation",
+      "description": "상담 방식 페이지 로딩 대기"
+    },
+    {
+      "action": "click",
+      "selector": ":text('전화')",
+      "description": "'전화' 선택"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 500
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text('다음')",
+      "description": "'다음' 클릭 (방식)"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 1000
+    },
+    {
+      "action": "waitFor",
+      "selector": "button:has-text('확인했어요')",
+      "state": "visible",
+      "description": "정보 확인 바텀시트 대기"
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text('확인했어요')",
+      "description": "'확인했어요' 클릭"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 2000,
+      "description": "GA 조회 대기"
+    },
+    {
+      "action": "waitFor",
+      "selector": "[role='dialog'][aria-modal='true']",
+      "state": "visible",
+      "description": "약관 바텀시트 대기"
+    },
+    {
+      "action": "screenshot",
+      "description": "약관 바텀시트 스크린샷"
+    },
+    {
+      "action": "click",
+      "selector": "[role='dialog'] button[aria-label='닫기']",
+      "description": "약관 바텀시트 닫기 (X)"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 1000
+    },
+    {
+      "action": "screenshot",
+      "description": "바텀시트 닫힘 확인"
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text('다음')",
+      "description": "'다음' 다시 클릭"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 2000
+    },
+    {
+      "action": "waitFor",
+      "selector": "button:has-text('확인했어요')",
+      "state": "visible",
+      "description": "정보 확인 바텀시트 재노출 확인"
+    },
+    {
+      "action": "screenshot",
+      "description": "재시도 후 바텀시트 재노출"
+    }
+  ]
+}

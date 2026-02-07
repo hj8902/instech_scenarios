@@ -1,0 +1,41 @@
+{
+  "id": "counsel-edge-types-no-topics-redirect",
+  "name": "topics 없이 types 직접 접근 시 리다이렉트",
+  "type": "test",
+  "category": "edge",
+  "requiresAuth": true,
+  "variables": [
+    "baseUrl"
+  ],
+  "description": "/counsel/types 직접 접근 → topics 페이지로 리다이렉트",
+  "steps": [
+    {
+      "action": "loadState",
+      "description": "저장된 인증 상태 로드"
+    },
+    {
+      "action": "navigate",
+      "url": "{{baseUrl}}/counsel/types",
+      "description": "topics 없이 types 페이지 직접 접근"
+    },
+    {
+      "action": "waitForNavigation",
+      "description": "페이지 로딩 대기"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 2000,
+      "description": "리다이렉트 완료 대기"
+    },
+    {
+      "action": "expect",
+      "type": "url",
+      "value": "/counsel/topics",
+      "description": "topics 페이지로 리다이렉트 확인"
+    },
+    {
+      "action": "screenshot",
+      "description": "리다이렉트 결과"
+    }
+  ]
+}

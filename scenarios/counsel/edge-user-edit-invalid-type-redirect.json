@@ -1,0 +1,41 @@
+{
+  "id": "counsel-edge-user-edit-invalid-type-redirect",
+  "name": "잘못된 type 파라미터로 user-edit 접근 시 리다이렉트",
+  "type": "test",
+  "category": "edge",
+  "requiresAuth": true,
+  "variables": [
+    "baseUrl"
+  ],
+  "description": "/counsel/user-edit/invalid 접근 → types 또는 topics으로 리다이렉트",
+  "steps": [
+    {
+      "action": "loadState",
+      "description": "저장된 인증 상태 로드"
+    },
+    {
+      "action": "navigate",
+      "url": "{{baseUrl}}/counsel/user-edit/invalid",
+      "description": "잘못된 type 파라미터로 접근"
+    },
+    {
+      "action": "waitForNavigation",
+      "description": "페이지 로딩 대기"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 2000,
+      "description": "리다이렉트 완료 대기"
+    },
+    {
+      "action": "expect",
+      "type": "url",
+      "value": "/counsel/topics",
+      "description": "리다이렉트 확인 (types→topics 체인)"
+    },
+    {
+      "action": "screenshot",
+      "description": "리다이렉트 결과"
+    }
+  ]
+}

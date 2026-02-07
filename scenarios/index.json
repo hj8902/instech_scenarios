@@ -179,6 +179,132 @@
       "category": "happy",
       "requiresAuth": true,
       "path": "counsel/chat-gender-x-terms-new.json"
+    },
+    {
+      "id": "counsel-edge-topics-button-state",
+      "name": "주제 미선택/해제 시 '다음' 버튼 disabled",
+      "description": "주제 0개 → 버튼 disabled → 선택 → enabled → 해제 → disabled",
+      "type": "test",
+      "category": "edge",
+      "requiresAuth": true,
+      "path": "counsel/edge-topics-button-state.json"
+    },
+    {
+      "id": "counsel-edge-types-no-topics-redirect",
+      "name": "topics 없이 types 직접 접근 시 리다이렉트",
+      "description": "/counsel/types 직접 접근 → topics 페이지로 리다이렉트",
+      "type": "test",
+      "category": "edge",
+      "requiresAuth": true,
+      "path": "counsel/edge-types-no-topics-redirect.json"
+    },
+    {
+      "id": "counsel-edge-types-ga-unavailable-alarm",
+      "name": "GA 컨설턴트 없음 → 제한 모달 → 알림 신청",
+      "description": "주제 선택 → 전화 상담 → 다음 → 확인 → GA 없음 모달 → 알림 받기",
+      "type": "test",
+      "category": "edge",
+      "requiresAuth": true,
+      "path": "counsel/edge-types-ga-unavailable-alarm.json"
+    },
+    {
+      "id": "counsel-edge-types-confirm-to-edit",
+      "name": "정보 확인 바텀시트에서 '정보 수정' 선택",
+      "description": "주제 선택 → 전화 → 확인 바텀시트 → '정보 수정' → user-edit 이동",
+      "type": "test",
+      "category": "edge",
+      "requiresAuth": true,
+      "path": "counsel/edge-types-confirm-to-edit.json"
+    },
+    {
+      "id": "counsel-edge-types-terms-close-retry",
+      "name": "약관 바텀시트 닫기 후 재시도",
+      "description": "주제 선택 → 전화 → 확인 → 약관 바텀시트 닫기 → 다시 시도 → 바텀시트 재노출",
+      "type": "test",
+      "category": "edge",
+      "requiresAuth": true,
+      "path": "counsel/edge-types-terms-close-retry.json"
+    },
+    {
+      "id": "counsel-edge-schedule-no-region",
+      "name": "지역 미선택 시 '다음' 버튼 disabled",
+      "description": "일정 선택 페이지 → 지역 미선택 → '다음' disabled 확인",
+      "type": "test",
+      "category": "edge",
+      "requiresAuth": true,
+      "path": "counsel/edge-schedule-no-region.json"
+    },
+    {
+      "id": "counsel-edge-schedule-sejong",
+      "name": "세종특별자치시 선택 시 시/군/구 선택 생략",
+      "description": "일정 선택 → 세종특별자치시 → 시/군/구 없이 바로 진행",
+      "type": "test",
+      "category": "edge",
+      "requiresAuth": true,
+      "path": "counsel/edge-schedule-sejong.json"
+    },
+    {
+      "id": "counsel-edge-schedule-ga-unavailable",
+      "name": "일정 선택 후 GA 컨설턴트 없음",
+      "description": "일정 선택 → 지역/시간 선택 → 다음 → GA 없음 모달",
+      "type": "test",
+      "category": "edge",
+      "requiresAuth": true,
+      "path": "counsel/edge-schedule-ga-unavailable.json"
+    },
+    {
+      "id": "counsel-edge-user-edit-name-validation",
+      "name": "이름 필드 유효성 검증 (한영 혼합, 자모)",
+      "description": "정보 수정 → 한영 혼합 이름 → 에러 → 자모 이름 → 에러",
+      "type": "test",
+      "category": "edge",
+      "requiresAuth": true,
+      "path": "counsel/edge-user-edit-name-validation.json"
+    },
+    {
+      "id": "counsel-edge-user-edit-phone-validation",
+      "name": "전화번호 필드 유효성 검증",
+      "description": "정보 수정 → 잘못된 전화번호 → 에러 메시지 확인",
+      "type": "test",
+      "category": "edge",
+      "requiresAuth": true,
+      "path": "counsel/edge-user-edit-phone-validation.json"
+    },
+    {
+      "id": "counsel-edge-user-edit-birth-gender-validation",
+      "name": "생년월일/성별 유효성 검증 (존재하지 않는 날짜, 불일치)",
+      "description": "정보 수정 → 존재하지 않는 생년월일 → 에러 → 생년월일-성별 불일치 → 에러",
+      "type": "test",
+      "category": "edge",
+      "requiresAuth": true,
+      "path": "counsel/edge-user-edit-birth-gender-validation.json"
+    },
+    {
+      "id": "counsel-edge-user-edit-submit-disabled",
+      "name": "'수정 완료' 버튼 disabled 상태 (미수정/에러)",
+      "description": "정보 수정 → 변경 없음 → disabled → 잘못된 입력 → disabled",
+      "type": "test",
+      "category": "edge",
+      "requiresAuth": true,
+      "path": "counsel/edge-user-edit-submit-disabled.json"
+    },
+    {
+      "id": "counsel-edge-user-edit-invalid-type-redirect",
+      "name": "잘못된 type 파라미터로 user-edit 접근 시 리다이렉트",
+      "description": "/counsel/user-edit/invalid 접근 → types 또는 topics으로 리다이렉트",
+      "type": "test",
+      "category": "edge",
+      "requiresAuth": true,
+      "path": "counsel/edge-user-edit-invalid-type-redirect.json"
+    },
+    {
+      "id": "counsel-edge-complete-api-failure",
+      "name": "상담 신청 API 실패 시 에러 처리",
+      "description": "전체 플로우 → 완료 페이지 → 자동 신청 → API 실패 → 에러 확인",
+      "type": "test",
+      "category": "edge",
+      "requiresAuth": true,
+      "path": "counsel/edge-complete-api-failure.json"
     }
   ]
 }

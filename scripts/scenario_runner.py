@@ -159,6 +159,28 @@ def execute_step(page, step, context):
             except Exception:
                 return {"status": "pass", "desc": desc}
 
+        elif expect_type == "disabled":
+            selector = step.get("selector", "")
+            try:
+                loc = page.locator(selector).first
+                loc.wait_for(state="attached", timeout=5000)
+                if loc.is_disabled():
+                    return {"status": "pass", "desc": desc}
+                return {"status": "fail", "desc": desc, "error": f"기대: disabled, 실제: enabled — {selector}"}
+            except Exception as e:
+                return {"status": "fail", "desc": desc, "error": str(e)}
+
+        elif expect_type == "enabled":
+            selector = step.get("selector", "")
+            try:
+                loc = page.locator(selector).first
+                loc.wait_for(state="attached", timeout=5000)
+                if loc.is_enabled():
+                    return {"status": "pass", "desc": desc}
+                return {"status": "fail", "desc": desc, "error": f"기대: enabled, 실제: disabled — {selector}"}
+            except Exception as e:
+                return {"status": "fail", "desc": desc, "error": str(e)}
+
     elif action == "waitForNavigation":
         page.wait_for_load_state("networkidle")
         page.wait_for_timeout(1000)

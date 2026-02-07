@@ -1,0 +1,105 @@
+{
+  "id": "counsel-edge-schedule-sejong",
+  "name": "세종특별자치시 선택 시 시/군/구 선택 생략",
+  "type": "test",
+  "category": "edge",
+  "requiresAuth": true,
+  "variables": [
+    "baseUrl"
+  ],
+  "precondition": "유저 프로필에 성별 정보가 있는 상태",
+  "description": "일정 선택 → 세종특별자치시 → 시/군/구 없이 바로 진행",
+  "steps": [
+    {
+      "action": "loadState",
+      "description": "저장된 인증 상태 로드"
+    },
+    {
+      "action": "navigate",
+      "url": "{{baseUrl}}/counsel/topics",
+      "description": "앱 로드"
+    },
+    {
+      "action": "waitForNavigation",
+      "description": "페이지 로딩 대기"
+    },
+    {
+      "action": "fetchAndInjectUserInfo",
+      "store": "COUNSEL",
+      "description": "유저 정보 주입"
+    },
+    {
+      "action": "injectStoreData",
+      "store": "COUNSEL",
+      "data": {
+        "topics": [
+          {
+            "id": 1
+          }
+        ]
+      },
+      "description": "토픽 데이터 주입 (가드 통과용)"
+    },
+    {
+      "action": "setSessionStorage",
+      "key": "__instech_counsel_entry__",
+      "value": "OTHER",
+      "description": "EntryType 설정"
+    },
+    {
+      "action": "navigate",
+      "url": "{{baseUrl}}/counsel/schedule",
+      "description": "일정 선택 페이지로 직접 이동"
+    },
+    {
+      "action": "waitForNavigation",
+      "description": "페이지 로딩 대기"
+    },
+    {
+      "action": "screenshot",
+      "description": "일정 선택 페이지"
+    },
+    {
+      "action": "click",
+      "selector": ":text('편한 지역을 선택해주세요')",
+      "description": "지역 선택 셀렉터 클릭"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 1000
+    },
+    {
+      "action": "click",
+      "selector": ":text('세종특별자치시')",
+      "description": "'세종특별자치시' 선택"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 2000,
+      "description": "용량 확인 대기"
+    },
+    {
+      "action": "screenshot",
+      "description": "세종 선택 후 (시/군/구 선택 없음)"
+    },
+    {
+      "action": "expect",
+      "type": "visible",
+      "selector": ":text('세종특별자치시')",
+      "description": "세종특별자치시 표시 확인"
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text('시간 상관없음')",
+      "description": "시간대 선택"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 500
+    },
+    {
+      "action": "screenshot",
+      "description": "세종 + 시간대 선택 완료"
+    }
+  ]
+}
