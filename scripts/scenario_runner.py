@@ -5,7 +5,9 @@ instech 시나리오 범용 러너
 - 전체 시나리오 실행 및 특정 시나리오 반복 실행 지원
 """
 
+import glob
 import json
+import os
 import re
 import urllib.request
 from playwright.sync_api import sync_playwright
@@ -288,6 +290,10 @@ def execute_step(page, step, context):
 
 def run_scenario(browser, scenario, variables, auth_state_path, screenshot_prefix, round_label=""):
     """단일 시나리오를 실행하고 결과 반환"""
+    # 이전 실행의 스크린샷 정리
+    for old in glob.glob(f"{screenshot_prefix}_*.png"):
+        os.remove(old)
+
     label = f"{round_label} " if round_label else ""
     print(f"\n{'='*50}")
     print(f"{label}{scenario['name']}")
