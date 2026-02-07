@@ -2,17 +2,31 @@
   "id": "counsel-edge-user-edit-birth-gender-validation",
   "name": "생년월일/성별 유효성 검증 (존재하지 않는 날짜, 불일치)",
   "type": "test",
-  "category": "edge",
   "requiresAuth": true,
   "variables": [
-    "baseUrl"
+    "baseUrl",
+    "entryType"
   ],
+  "defaults": {
+    "entryType": "OTHER"
+  },
   "precondition": "유저 프로필에 성별 정보가 있는 상태",
   "description": "정보 수정 → 존재하지 않는 생년월일 → 에러 → 생년월일-성별 불일치 → 에러",
   "steps": [
     {
       "action": "loadState",
       "description": "저장된 인증 상태 로드"
+    },
+    {
+      "action": "navigate",
+      "url": "{{baseUrl}}",
+      "description": "세션 스토리지 설정을 위해 기본 페이지로 이동"
+    },
+    {
+      "action": "setSessionStorage",
+      "key": "__instech_counsel_entry__",
+      "value": "{{entryType}}",
+      "description": "EntryType 설정"
     },
     {
       "action": "navigate",
@@ -27,12 +41,6 @@
       "action": "fetchAndInjectUserInfo",
       "store": "COUNSEL",
       "description": "유저 정보 주입"
-    },
-    {
-      "action": "setSessionStorage",
-      "key": "__instech_counsel_entry__",
-      "value": "OTHER",
-      "description": "EntryType 설정"
     },
     {
       "action": "navigate",
@@ -105,5 +113,6 @@
       "action": "screenshot",
       "description": "생년월일-성별 불일치 에러"
     }
-  ]
+  ],
+  "category": "edge"
 }

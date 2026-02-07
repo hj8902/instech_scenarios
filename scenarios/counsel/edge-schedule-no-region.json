@@ -2,17 +2,31 @@
   "id": "counsel-edge-schedule-no-region",
   "name": "지역 미선택 시 '다음' 버튼 disabled",
   "type": "test",
-  "category": "edge",
   "requiresAuth": true,
   "variables": [
-    "baseUrl"
+    "baseUrl",
+    "entryType"
   ],
+  "defaults": {
+    "entryType": "OTHER"
+  },
   "precondition": "유저 프로필에 성별 정보가 있는 상태",
   "description": "일정 선택 페이지 → 지역 미선택 → '다음' disabled 확인",
   "steps": [
     {
       "action": "loadState",
       "description": "저장된 인증 상태 로드"
+    },
+    {
+      "action": "navigate",
+      "url": "{{baseUrl}}",
+      "description": "세션 스토리지 설정을 위해 기본 페이지로 이동"
+    },
+    {
+      "action": "setSessionStorage",
+      "key": "__instech_counsel_entry__",
+      "value": "{{entryType}}",
+      "description": "EntryType 설정"
     },
     {
       "action": "navigate",
@@ -41,12 +55,6 @@
       "description": "토픽 데이터 주입 (가드 통과용)"
     },
     {
-      "action": "setSessionStorage",
-      "key": "__instech_counsel_entry__",
-      "value": "OTHER",
-      "description": "EntryType 설정"
-    },
-    {
       "action": "navigate",
       "url": "{{baseUrl}}/counsel/schedule",
       "description": "일정 선택 페이지로 직접 이동"
@@ -65,5 +73,6 @@
       "selector": "button:has-text('다음')",
       "description": "'다음' 버튼 disabled 확인 (지역 미선택)"
     }
-  ]
+  ],
+  "category": "edge"
 }

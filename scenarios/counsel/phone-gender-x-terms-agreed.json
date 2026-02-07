@@ -4,8 +4,12 @@
   "type": "test",
   "requiresAuth": true,
   "variables": [
-    "baseUrl"
+    "baseUrl",
+    "entryType"
   ],
+  "defaults": {
+    "entryType": "OTHER"
+  },
   "precondition": "상담 약관에 이미 동의한 상태",
   "description": "주제 선택 → 전화 상담 선택 → 정보 수정 → 상담 신청 완료",
   "steps": [
@@ -15,18 +19,23 @@
     },
     {
       "action": "navigate",
+      "url": "{{baseUrl}}",
+      "description": "세션 스토리지 설정을 위해 기본 페이지로 이동"
+    },
+    {
+      "action": "setSessionStorage",
+      "key": "__instech_counsel_entry__",
+      "value": "{{entryType}}",
+      "description": "EntryType 설정"
+    },
+    {
+      "action": "navigate",
       "url": "{{baseUrl}}/counsel/topics",
       "description": "상담 주제 선택 페이지로 이동"
     },
     {
       "action": "waitForNavigation",
       "description": "페이지 로딩 대기"
-    },
-    {
-      "action": "setSessionStorage",
-      "key": "__instech_counsel_entry__",
-      "value": "OTHER",
-      "description": "EntryType 설정 (기타)"
     },
     {
       "action": "screenshot",

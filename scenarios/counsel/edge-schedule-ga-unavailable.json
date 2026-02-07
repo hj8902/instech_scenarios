@@ -2,17 +2,31 @@
   "id": "counsel-edge-schedule-ga-unavailable",
   "name": "일정 선택 후 GA 컨설턴트 없음",
   "type": "test",
-  "category": "edge",
   "requiresAuth": true,
   "variables": [
-    "baseUrl"
+    "baseUrl",
+    "entryType"
   ],
+  "defaults": {
+    "entryType": "OTHER"
+  },
   "precondition": "선택한 지역에 배정 가능한 GA 컨설턴트가 없는 상태 (E000001)",
   "description": "일정 선택 → 지역/시간 선택 → 다음 → GA 없음 모달",
   "steps": [
     {
       "action": "loadState",
       "description": "저장된 인증 상태 로드"
+    },
+    {
+      "action": "navigate",
+      "url": "{{baseUrl}}",
+      "description": "세션 스토리지 설정을 위해 기본 페이지로 이동"
+    },
+    {
+      "action": "setSessionStorage",
+      "key": "__instech_counsel_entry__",
+      "value": "{{entryType}}",
+      "description": "EntryType 설정"
     },
     {
       "action": "navigate",
@@ -39,12 +53,6 @@
         ]
       },
       "description": "토픽 데이터 주입 (가드 통과용)"
-    },
-    {
-      "action": "setSessionStorage",
-      "key": "__instech_counsel_entry__",
-      "value": "OTHER",
-      "description": "EntryType 설정"
     },
     {
       "action": "navigate",
@@ -112,5 +120,6 @@
       "action": "screenshot",
       "description": "GA 제한 모달 스크린샷"
     }
-  ]
+  ],
+  "category": "edge"
 }
