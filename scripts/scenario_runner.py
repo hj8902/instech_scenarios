@@ -84,8 +84,6 @@ def execute_step(page, step, context):
     elif action == "navigate":
         url = step.get("url", "")
         page.goto(url)
-        page.wait_for_load_state("networkidle")
-        page.wait_for_timeout(1000)
         # 세션 만료 체크
         if "/web-login" in page.url:
             return {"status": "fail", "desc": desc, "error": "세션 만료 — /web-login으로 리다이렉트됨"}
@@ -96,25 +94,21 @@ def execute_step(page, step, context):
         value = step.get("value", "")
         el = page.locator(selector).first
         el.fill(value)
-        page.wait_for_timeout(500)
         return {"status": "pass", "desc": desc}
 
     elif action == "blur":
         selector = step.get("selector", "input")
         page.locator(selector).first.blur()
-        page.wait_for_timeout(500)
         return {"status": "pass", "desc": desc}
 
     elif action == "clear":
         selector = step.get("selector", "input")
         page.locator(selector).first.fill("")
-        page.wait_for_timeout(300)
         return {"status": "pass", "desc": desc}
 
     elif action == "click":
         selector = step.get("selector", "")
         page.locator(selector).first.click()
-        page.wait_for_timeout(500)
         return {"status": "pass", "desc": desc}
 
     elif action == "screenshot":
@@ -183,7 +177,6 @@ def execute_step(page, step, context):
 
     elif action == "waitForNavigation":
         page.wait_for_load_state("networkidle")
-        page.wait_for_timeout(1000)
         return {"status": "pass", "desc": desc}
 
     elif action == "waitFor":
@@ -349,12 +342,13 @@ def run_scenario(browser, scenario, variables, auth_state_path, screenshot_prefi
 
 # ── 전체 실행 / 반복 실행 ──
 
-def run_all(base_url, feature_path, auth_state_path):
-    """특정 기능의 전체 시나리오 1회 실행"""
+def run_all(base_url, feature_path, auth_state_path, category=None):
+    """특정 기능의 전체 시나리오 1회 실행. category='happy'/'edge'로 필터 가능."""
     index = fetch_index()
     test_scenarios = [
         s for s in index["scenarios"]
         if s["type"] == "test" and s["path"].startswith(feature_path)
+        and (category is None or s.get("category", "happy") == category)
     ]
 
     variables = {"baseUrl": base_url}
