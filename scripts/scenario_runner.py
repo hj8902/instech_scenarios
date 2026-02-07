@@ -11,6 +11,7 @@ import urllib.request
 from playwright.sync_api import sync_playwright
 
 SCENARIOS_BASE_URL = "https://hj8902.github.io/instech_scenarios/scenarios"
+ACTION_SETTLE_MS = 200  # React 상태 커밋 대기 (fill/blur/click/clear 후)
 
 
 # ── JSON fetch ──
@@ -84,6 +85,7 @@ def execute_step(page, step, context):
     elif action == "navigate":
         url = step.get("url", "")
         page.goto(url)
+        page.wait_for_load_state("networkidle")
         # 세션 만료 체크
         if "/web-login" in page.url:
             return {"status": "fail", "desc": desc, "error": "세션 만료 — /web-login으로 리다이렉트됨"}
@@ -94,21 +96,25 @@ def execute_step(page, step, context):
         value = step.get("value", "")
         el = page.locator(selector).first
         el.fill(value)
+        page.wait_for_timeout(ACTION_SETTLE_MS)
         return {"status": "pass", "desc": desc}
 
     elif action == "blur":
         selector = step.get("selector", "input")
         page.locator(selector).first.blur()
+        page.wait_for_timeout(ACTION_SETTLE_MS)
         return {"status": "pass", "desc": desc}
 
     elif action == "clear":
         selector = step.get("selector", "input")
         page.locator(selector).first.fill("")
+        page.wait_for_timeout(ACTION_SETTLE_MS)
         return {"status": "pass", "desc": desc}
 
     elif action == "click":
         selector = step.get("selector", "")
         page.locator(selector).first.click()
+        page.wait_for_timeout(ACTION_SETTLE_MS)
         return {"status": "pass", "desc": desc}
 
     elif action == "screenshot":
