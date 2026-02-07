@@ -5,7 +5,12 @@
   "requiresAuth": true,
   "variables": [
     "baseUrl",
-    "entryType"
+    "entryType",
+    "userId",
+    "userName",
+    "userPhone",
+    "userBirthDate",
+    "userGender"
   ],
   "defaults": {
     "entryType": "OTHER"
@@ -35,7 +40,14 @@
     {
       "action": "fetchAndInjectUserInfo",
       "store": "COUNSEL",
-      "description": "유저 정보 주입"
+      "userData": {
+        "userId": "{{userId}}",
+        "name": "{{userName}}",
+        "phoneNumber": "{{userPhone}}",
+        "birthDate": "{{userBirthDate}}",
+        "gender": "{{userGender}}"
+      },
+      "description": "유저 정보를 store에 주입"
     },
     {
       "action": "injectStoreData",
