@@ -3,6 +3,7 @@
 instech 시나리오 범용 러너
 - 시나리오 JSON을 읽어서 모든 step을 자동으로 Playwright 코드로 변환/실행
 - 전체 시나리오 실행 및 특정 시나리오 반복 실행 지원
+- 병렬 실행 지원 (MAX_WORKERS 설정 가능)
 """
 
 import glob
@@ -10,9 +11,11 @@ import json
 import os
 import re
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from playwright.sync_api import sync_playwright
 
 SCENARIOS_BASE_URL = "https://hj8902.github.io/instech_scenarios/scenarios"
+MAX_WORKERS = 4  # 최대 병렬 브라우저 컨텍스트 수
 ACTION_SETTLE_MS = 200  # React 상태 커밋 대기 (fill/blur/click/clear 후)
 
 
@@ -223,6 +226,34 @@ def execute_step(page, step, context):
             return {"status": "fail", "desc": f"{desc} — {result_msg}"}
         return {"status": "pass", "desc": f"{desc} — {result_msg}"}
 
+    elif action == "injectStoreData":
+        store = step.get("store", "")
+        data = step.get("data", {})
+        store_var = f"__{'COUNSEL' if store == 'COUNSEL' else store}_STORE__"
+        js_data = json.dumps(data)
+        page.evaluate(f"""() => {{
+            const store = window.{store_var};
+            if (store) store.setState({js_data});
+        }}""")
+        return {"status": "pass", "desc": desc}
+
+    elif action == "fetchAndInjectUserInfo":
+        store = step.get("store", "")
+        store_var = f"__{'COUNSEL' if store == 'COUNSEL' else store}_STORE__"
+        page.evaluate(f"""async () => {{
+            const resp = await fetch('/api/proxy/instech/v1/me');
+            const json = await resp.json();
+            const store = window.{store_var};
+            if (store) store.setState({{ userInfo: json.data }});
+        }}""")
+        return {"status": "pass", "desc": desc}
+
+    elif action == "setSessionStorage":
+        key = step.get("key", "")
+        value = step.get("value", "")
+        page.evaluate(f"sessionStorage.setItem('{key}', '{value}')")
+        return {"status": "pass", "desc": desc}
+
     elif action == "saveState":
         path = context.get("auth_state_path", "/tmp/instech_auth_state.json")
         context["browser_context"].storage_state(path=path)
@@ -230,51 +261,6 @@ def execute_step(page, step, context):
 
     elif action == "launchBrowser":
         # 브라우저 재실행은 러너 레벨에서 처리
-        return {"status": "pass", "desc": desc}
-
-    elif action == "injectStoreData":
-        store_name = step.get("store", "")
-        data = step.get("data", {})
-        data = substitute_variables(data, context.get("variables", {}))
-        window_key = f"__{store_name.upper()}_STORE__"
-        js = f"window.{window_key}?.setState({json.dumps(data)})"
-        page.evaluate(js)
-        page.wait_for_timeout(300)
-        return {"status": "pass", "desc": desc}
-
-    elif action == "fetchAndInjectUserInfo":
-        base_url = context.get("variables", {}).get("baseUrl", "")
-        store_name = step.get("store", "COUNSEL")
-        # me API 호출 (브라우저 컨텍스트의 쿠키 사용)
-        user_data = page.evaluate("""async () => {
-            const res = await fetch('/api/proxy/users/me');
-            const json = await res.json();
-            return json.data;
-        }""")
-        # 전화번호 포맷팅 (01012345678 → 010-1234-5678)
-        phone = user_data.get("phone", "")
-        if len(phone) == 11:
-            phone = f"{phone[:3]}-{phone[3:7]}-{phone[7:]}"
-        elif len(phone) == 10:
-            phone = f"{phone[:3]}-{phone[3:6]}-{phone[6:]}"
-        user_info = {
-            "userId": user_data.get("userId", ""),
-            "name": user_data.get("name", ""),
-            "phoneNumber": phone,
-            "birthDate": user_data.get("fullBirth", ""),
-            "gender": user_data.get("genderCode", ""),
-        }
-        window_key = f"__{store_name.upper()}_STORE__"
-        js = f"window.{window_key}?.setState({{ userInfo: {json.dumps(user_info)} }})"
-        page.evaluate(js)
-        page.wait_for_timeout(300)
-        return {"status": "pass", "desc": f"{desc} — {user_info['name']} ({user_info['gender']})"}
-
-    elif action == "setSessionStorage":
-        key = step.get("key", "")
-        value = step.get("value", "")
-        value = substitute_variables(value, context.get("variables", {}))
-        page.evaluate(f"sessionStorage.setItem('{key}', '{value}')")
         return {"status": "pass", "desc": desc}
 
     elif action == "manualAction":
@@ -295,8 +281,9 @@ def run_scenario(browser, scenario, variables, auth_state_path, screenshot_prefi
         os.remove(old)
 
     label = f"{round_label} " if round_label else ""
+    scenario_name = scenario['name']
     print(f"\n{'='*50}")
-    print(f"{label}{scenario['name']}")
+    print(f"{label}{scenario_name}")
     print(f"{'='*50}")
 
     # 변수 치환
@@ -312,12 +299,12 @@ def run_scenario(browser, scenario, variables, auth_state_path, screenshot_prefi
         ctx = browser.new_context()
 
     page = ctx.new_page()
+    page.set_default_timeout(10000)  # 셀렉터 타임아웃 10초 (기본 30초 → 단축)
 
     context = {
         "screenshot_path": screenshot_prefix,
         "auth_state_path": auth_state_path,
         "browser_context": ctx,
-        "variables": variables,
     }
 
     results = []
@@ -349,39 +336,97 @@ def run_scenario(browser, scenario, variables, auth_state_path, screenshot_prefi
                 break
 
     ctx.close()
-    return {"name": scenario["name"], "steps": results, "status": scenario_status}
+    return {
+        "id": scenario.get("id", ""),
+        "name": scenario_name,
+        "description": scenario.get("description", ""),
+        "precondition": scenario.get("precondition", ""),
+        "steps": results,
+        "status": scenario_status,
+    }
+
+
+# ── 병렬 실행을 위한 워커 함수 ──
+
+def _run_worker_batch(batch):
+    """워커 1개가 브라우저 1개로 할당된 시나리오 그룹을 순차 실행."""
+    auth_state_path = batch["auth_state_path"]
+    results = []
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        for item in batch["items"]:
+            result = run_scenario(
+                browser, item["scenario"], item["variables"],
+                auth_state_path, item["screenshot_prefix"]
+            )
+            results.append((item["index"], result))
+        browser.close()
+
+    return results
 
 
 # ── 전체 실행 / 반복 실행 ──
 
-def run_all(base_url, feature_path, auth_state_path, category=None):
-    """특정 기능의 전체 시나리오 1회 실행. category='happy'/'edge'로 필터 가능."""
+def run_all(base_url, feature_path, auth_state_path, category=None, extra_vars=None):
+    """특정 기능의 전체 시나리오 실행. 2개 이상이면 병렬 실행."""
     index = fetch_index()
-    test_scenarios = [
+    test_scenarios_meta = [
         s for s in index["scenarios"]
         if s["type"] == "test" and s["path"].startswith(feature_path)
         and (category is None or s.get("category", "happy") == category)
     ]
 
+    if not test_scenarios_meta:
+        print("실행할 시나리오가 없습니다.")
+        return []
+
+    # 시나리오 JSON 미리 fetch (병렬 실행 전)
     variables = {"baseUrl": base_url}
-    all_results = []
+    tasks = []
+    for meta in test_scenarios_meta:
+        scenario = fetch_scenario(meta["path"])
+        if scenario.get("defaults"):
+            for k, v in scenario["defaults"].items():
+                if k not in variables:
+                    variables[k] = v
+        # extra_vars는 defaults보다 우선 (사용자 지정 값)
+        if extra_vars:
+            variables.update(extra_vars)
+        tasks.append({
+            "scenario": scenario,
+            "variables": dict(variables),
+            "screenshot_prefix": f"/tmp/scenario_{scenario['id']}",
+        })
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+    total = len(tasks)
+    workers = min(MAX_WORKERS, total)
 
-        for scenario_meta in test_scenarios:
-            scenario = fetch_scenario(scenario_meta["path"])
-            # defaults 병합
-            if scenario.get("defaults"):
-                for k, v in scenario["defaults"].items():
-                    if k not in variables:
-                        variables[k] = v
+    print(f"\n시나리오 {total}개 실행 (브라우저 {workers}개 병렬)")
 
-            prefix = f"/tmp/scenario_{scenario['id']}"
-            result = run_scenario(browser, scenario, variables, auth_state_path, prefix)
-            all_results.append(result)
+    if total == 1:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            result = run_scenario(browser, tasks[0]["scenario"], tasks[0]["variables"],
+                                  auth_state_path, tasks[0]["screenshot_prefix"])
+            browser.close()
+        all_results = [result]
+    else:
+        # 시나리오를 워커 수만큼 균등 분배 (라운드로빈)
+        batches = [{"auth_state_path": auth_state_path, "items": []} for _ in range(workers)]
+        for i, task in enumerate(tasks):
+            task["index"] = i
+            batches[i % workers]["items"].append(task)
 
-        browser.close()
+        all_results = [None] * total
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            futures = [executor.submit(_run_worker_batch, batch) for batch in batches]
+            for future in as_completed(futures):
+                try:
+                    for idx, result in future.result():
+                        all_results[idx] = result
+                except Exception as e:
+                    print(f"  워커 에러: {e}")
 
     # 요약
     print(f"\n{'='*50}")
@@ -409,12 +454,14 @@ def run_all(base_url, feature_path, auth_state_path, category=None):
     return all_results
 
 
-def run_repeat(base_url, scenario_path, repeat_count, auth_state_path):
+def run_repeat(base_url, scenario_path, repeat_count, auth_state_path, extra_vars=None):
     """특정 시나리오를 N회 반복 실행"""
     scenario = fetch_scenario(scenario_path)
     variables = {"baseUrl": base_url}
     if scenario.get("defaults"):
         variables.update(scenario["defaults"])
+    if extra_vars:
+        variables.update(extra_vars)
 
     all_rounds = []
 
@@ -472,7 +519,8 @@ if __name__ == "__main__":
 
     if mode == "all":
         feature = sys.argv[4] if len(sys.argv) > 4 else "age-calculation/"
-        run_all(base_url, feature, auth_path)
+        category = sys.argv[5] if len(sys.argv) > 5 else None
+        run_all(base_url, feature, auth_path, category=category)
     elif mode == "repeat":
         scenario_path = sys.argv[4] if len(sys.argv) > 4 else "age-calculation/input-to-result.json"
         repeat_count = int(sys.argv[5]) if len(sys.argv) > 5 else 3

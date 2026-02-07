@@ -9,7 +9,7 @@ import base64
 import glob
 import os
 from datetime import datetime
-from scenario_runner import fetch_index, fetch_scenario, run_all, run_repeat
+from scenario_runner import fetch_scenario, run_all, run_repeat
 
 
 def encode_screenshot(path):
@@ -217,18 +217,8 @@ def render_meta_html(now, base_url, extra_items=None):
 
 # ── 전체 시나리오 리포트 ──
 
-def generate_report(base_url, feature_path, auth_state_path):
-    all_results = run_all(base_url, feature_path, auth_state_path)
-
-    index = fetch_index()
-    scenario_details = {}
-    for s in index["scenarios"]:
-        if s["type"] == "test" and s["path"].startswith(feature_path):
-            try:
-                detail = fetch_scenario(s["path"])
-                scenario_details[detail.get("id", s["id"])] = detail
-            except Exception:
-                pass
+def generate_report(base_url, feature_path, auth_state_path, category=None, extra_vars=None):
+    all_results = run_all(base_url, feature_path, auth_state_path, category=category, extra_vars=extra_vars)
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     total = len(all_results)
@@ -276,15 +266,9 @@ def generate_report(base_url, feature_path, auth_state_path):
         name = result["name"]
         status = result["status"]
 
-        detail = None
-        for sid, d in scenario_details.items():
-            if d.get("name") == name:
-                detail = d
-                break
-
-        scenario_id = detail["id"] if detail else name.replace(" ", "-")
-        description = detail.get("description", "") if detail else ""
-        precondition = detail.get("precondition", "") if detail else ""
+        scenario_id = result.get("id", name.replace(" ", "-"))
+        description = result.get("description", "")
+        precondition = result.get("precondition", "")
 
         badge_text = "통과" if status == "pass" else "실패"
         open_class = "open" if status == "fail" else ""
@@ -323,8 +307,8 @@ def generate_report(base_url, feature_path, auth_state_path):
 
 # ── 반복 테스트 리포트 ──
 
-def generate_repeat_report(base_url, scenario_path, repeat_count, auth_state_path):
-    all_rounds = run_repeat(base_url, scenario_path, repeat_count, auth_state_path)
+def generate_repeat_report(base_url, scenario_path, repeat_count, auth_state_path, extra_vars=None):
+    all_rounds = run_repeat(base_url, scenario_path, repeat_count, auth_state_path, extra_vars=extra_vars)
 
     # 시나리오 상세 JSON
     try:
@@ -419,19 +403,33 @@ def generate_repeat_report(base_url, scenario_path, repeat_count, auth_state_pat
 if __name__ == "__main__":
     import sys
 
-    mode = sys.argv[1] if len(sys.argv) > 1 else "all"
-    base_url = sys.argv[2] if len(sys.argv) > 2 else "https://instech.stg.3o3.co.kr"
-    auth_path = sys.argv[3] if len(sys.argv) > 3 else "/tmp/instech_auth_state_stg.json"
+    # --var key=value 파싱 (예: --var entryType=OTHER)
+    extra_vars = {}
+    positional = []
+    i = 1
+    while i < len(sys.argv):
+        if sys.argv[i] == "--var" and i + 1 < len(sys.argv):
+            k, v = sys.argv[i + 1].split("=", 1)
+            extra_vars[k] = v
+            i += 2
+        else:
+            positional.append(sys.argv[i])
+            i += 1
+
+    mode = positional[0] if len(positional) > 0 else "all"
+    base_url = positional[1] if len(positional) > 1 else "https://instech.stg.3o3.co.kr"
+    auth_path = positional[2] if len(positional) > 2 else "/tmp/instech_auth_state_stg.json"
 
     output_path = "/tmp/instech_test_report.html"
 
     if mode == "all":
-        feature = sys.argv[4] if len(sys.argv) > 4 else "age-calculation/"
-        report_html = generate_report(base_url, feature, auth_path)
+        feature = positional[3] if len(positional) > 3 else "age-calculation/"
+        category = positional[4] if len(positional) > 4 else None
+        report_html = generate_report(base_url, feature, auth_path, category=category, extra_vars=extra_vars or None)
     elif mode == "repeat":
-        scenario_path = sys.argv[4] if len(sys.argv) > 4 else "age-calculation/input-to-result.json"
-        repeat_count = int(sys.argv[5]) if len(sys.argv) > 5 else 3
-        report_html = generate_repeat_report(base_url, scenario_path, repeat_count, auth_path)
+        scenario_path = positional[3] if len(positional) > 3 else "age-calculation/input-to-result.json"
+        repeat_count = int(positional[4]) if len(positional) > 4 else 3
+        report_html = generate_repeat_report(base_url, scenario_path, repeat_count, auth_path, extra_vars=extra_vars or None)
     else:
         print(f"Unknown mode: {mode}")
         sys.exit(1)
