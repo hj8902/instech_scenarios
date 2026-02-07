@@ -251,7 +251,11 @@ def execute_step(page, step, context):
     elif action == "setSessionStorage":
         key = step.get("key", "")
         value = step.get("value", "")
-        page.evaluate(f"sessionStorage.setItem('{key}', '{value}')")
+        if page.url == "about:blank":
+            # 아직 navigate 전 — init script로 등록하면 다음 페이지 JS 실행 전에 설정됨
+            context["browser_context"].add_init_script(f"sessionStorage.setItem('{key}', '{value}')")
+        else:
+            page.evaluate(f"sessionStorage.setItem('{key}', '{value}')")
         return {"status": "pass", "desc": desc}
 
     elif action == "saveState":

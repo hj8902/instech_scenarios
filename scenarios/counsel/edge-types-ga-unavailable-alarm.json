@@ -18,11 +18,6 @@
       "description": "저장된 인증 상태 로드"
     },
     {
-      "action": "navigate",
-      "url": "{{baseUrl}}",
-      "description": "세션 스토리지 설정을 위해 기본 페이지로 이동"
-    },
-    {
       "action": "setSessionStorage",
       "key": "__instech_counsel_entry__",
       "value": "{{entryType}}",
