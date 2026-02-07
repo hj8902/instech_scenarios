@@ -213,11 +213,39 @@ def execute_step(page, step, context):
         store_name = step.get("store", "")
         data = step.get("data", {})
         data = substitute_variables(data, context.get("variables", {}))
-        window_key = f"__{ store_name.upper() }_STORE__"
+        window_key = f"__{store_name.upper()}_STORE__"
         js = f"window.{window_key}?.setState({json.dumps(data)})"
         page.evaluate(js)
         page.wait_for_timeout(300)
         return {"status": "pass", "desc": desc}
+
+    elif action == "fetchAndInjectUserInfo":
+        base_url = context.get("variables", {}).get("baseUrl", "")
+        store_name = step.get("store", "COUNSEL")
+        # me API 호출 (브라우저 컨텍스트의 쿠키 사용)
+        user_data = page.evaluate("""async () => {
+            const res = await fetch('/api/proxy/users/me');
+            const json = await res.json();
+            return json.data;
+        }""")
+        # 전화번호 포맷팅 (01012345678 → 010-1234-5678)
+        phone = user_data.get("phone", "")
+        if len(phone) == 11:
+            phone = f"{phone[:3]}-{phone[3:7]}-{phone[7:]}"
+        elif len(phone) == 10:
+            phone = f"{phone[:3]}-{phone[3:6]}-{phone[6:]}"
+        user_info = {
+            "userId": user_data.get("userId", ""),
+            "name": user_data.get("name", ""),
+            "phoneNumber": phone,
+            "birthDate": user_data.get("fullBirth", ""),
+            "gender": user_data.get("genderCode", ""),
+        }
+        window_key = f"__{store_name.upper()}_STORE__"
+        js = f"window.{window_key}?.setState({{ userInfo: {json.dumps(user_info)} }})"
+        page.evaluate(js)
+        page.wait_for_timeout(300)
+        return {"status": "pass", "desc": f"{desc} — {user_info['name']} ({user_info['gender']})"}
 
     elif action == "setSessionStorage":
         key = step.get("key", "")
