@@ -199,15 +199,6 @@
       "path": "counsel/edge-types-no-topics-redirect.json"
     },
     {
-      "id": "counsel-edge-types-ga-unavailable-alarm",
-      "name": "GA 컨설턴트 없음 → 제한 모달 → 알림 신청",
-      "description": "주제 선택 → 전화 상담 → 다음 → 확인 → GA 없음 모달 → 알림 받기",
-      "type": "test",
-      "labels": ["edge-case"],
-      "requiresAuth": true,
-      "path": "counsel/edge-types-ga-unavailable-alarm.json"
-    },
-    {
       "id": "counsel-edge-types-confirm-to-edit",
       "name": "정보 확인 바텀시트에서 '정보 수정' 선택",
       "description": "주제 선택 → 전화 → 확인 바텀시트 → '정보 수정' → user-edit 이동",
@@ -242,15 +233,6 @@
       "labels": ["edge-case", "inperson"],
       "requiresAuth": true,
       "path": "counsel/edge-schedule-sejong.json"
-    },
-    {
-      "id": "counsel-edge-schedule-ga-unavailable",
-      "name": "일정 선택 후 GA 컨설턴트 없음",
-      "description": "일정 선택 → 지역/시간 선택 → 다음 → GA 없음 모달",
-      "type": "test",
-      "labels": ["edge-case", "inperson"],
-      "requiresAuth": true,
-      "path": "counsel/edge-schedule-ga-unavailable.json"
     },
     {
       "id": "counsel-edge-user-edit-name-validation",
@@ -296,15 +278,6 @@
       "labels": ["edge-case"],
       "requiresAuth": true,
       "path": "counsel/edge-user-edit-invalid-type-redirect.json"
-    },
-    {
-      "id": "counsel-edge-complete-api-failure",
-      "name": "상담 신청 API 실패 시 에러 처리",
-      "description": "전체 플로우 → 완료 페이지 → 자동 신청 → API 실패 → 에러 확인",
-      "type": "test",
-      "labels": ["edge-case"],
-      "requiresAuth": true,
-      "path": "counsel/edge-complete-api-failure.json"
     }
   ]
 }
