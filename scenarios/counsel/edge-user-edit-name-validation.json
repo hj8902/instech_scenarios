@@ -31,7 +31,7 @@
     {
       "action": "navigate",
       "url": "{{baseUrl}}/counsel/topics",
-      "description": "앱 로드"
+      "description": "상담 주제 선택 페이지로 이동"
     },
     {
       "action": "waitForNavigation",
@@ -50,13 +50,46 @@
       "description": "유저 정보를 store에 주입"
     },
     {
-      "action": "navigate",
-      "url": "{{baseUrl}}/counsel/user-edit/Phone",
-      "description": "정보 수정 페이지로 직접 이동 (Phone)"
+      "action": "click",
+      "selector": "input[type='checkbox']",
+      "description": "첫 번째 주제 선택"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 500
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text('다음')",
+      "description": "'다음' 클릭 (주제)"
     },
     {
       "action": "waitForNavigation",
-      "description": "페이지 로딩 대기"
+      "description": "상담 방식 선택 페이지 로딩 대기"
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text('다음')",
+      "description": "'다음' 클릭 (방식 — 만나서 상담 기본 선택)"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 1000
+    },
+    {
+      "action": "waitFor",
+      "selector": "button:has-text('확인했어요')",
+      "state": "visible",
+      "description": "정보 확인 바텀시트 대기"
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text('정보 수정')",
+      "description": "'정보 수정' 클릭"
+    },
+    {
+      "action": "waitForNavigation",
+      "description": "정보 수정 페이지 로딩 대기"
     },
     {
       "action": "screenshot",
