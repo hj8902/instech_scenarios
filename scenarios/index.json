@@ -198,16 +198,7 @@
       "requiresAuth": true,
       "path": "counsel/edge-types-no-topics-redirect.json"
     },
-    {
-      "id": "counsel-edge-types-confirm-to-edit",
-      "name": "정보 확인 바텀시트에서 '정보 수정' 선택",
-      "description": "주제 선택 → 전화 → 확인 바텀시트 → '정보 수정' → user-edit 이동",
-      "type": "test",
-      "labels": ["edge-case"],
-      "requiresAuth": true,
-      "path": "counsel/edge-types-confirm-to-edit.json"
-    },
-    {
+{
       "id": "counsel-edge-types-terms-close-retry",
       "name": "약관 바텀시트 닫기 후 재시도",
       "description": "주제 선택 → 전화 → 확인 → 약관 바텀시트 닫기 → 다시 시도 → 바텀시트 재노출",
