@@ -15,8 +15,17 @@
     },
     {
       "action": "navigate",
+      "url": "{{baseUrl}}/counsel/topics",
+      "description": "topics 페이지 방문 (히스토리 생성)"
+    },
+    {
+      "action": "waitForNavigation",
+      "description": "topics 페이지 로딩 대기"
+    },
+    {
+      "action": "navigate",
       "url": "{{baseUrl}}/counsel/user-edit/invalid",
-      "description": "잘못된 type 파라미터로 접근"
+      "description": "잘못된 type 파라미터로 직접 접근"
     },
     {
       "action": "waitForNavigation",
