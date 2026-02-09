@@ -9,14 +9,13 @@
     "userId",
     "userName",
     "userPhone",
-    "userBirthDate",
-    "userGender"
+    "userBirthDate"
   ],
   "defaults": {
     "entryType": "OTHER"
   },
-  "precondition": "유저 프로필에 성별 정보가 있는 상태",
-  "description": "일정 선택 페이지 → 지역 미선택 → '다음' disabled 확인",
+  "precondition": "유저 프로필에 성별 정보가 없는 상태",
+  "description": "만나서 상담 → 일정 선택 페이지 → 지역 미선택 → '다음' disabled 확인",
   "steps": [
     {
       "action": "loadState",
@@ -45,9 +44,9 @@
         "name": "{{userName}}",
         "phoneNumber": "{{userPhone}}",
         "birthDate": "{{userBirthDate}}",
-        "gender": "{{userGender}}"
+        "gender": ""
       },
-      "description": "유저 정보를 store에 주입"
+      "description": "유저 정보를 store에 주입 (gender X — 성별 미입력)"
     },
     {
       "action": "click",
@@ -69,23 +68,17 @@
     },
     {
       "action": "click",
-      "selector": "button:has-text('다음')",
-      "description": "'다음' 클릭 (방식 — 만나서 상담 기본 선택)"
+      "selector": ":text('만나서 상담')",
+      "description": "'만나서 상담' 선택"
     },
     {
       "action": "waitForTimeout",
-      "timeout": 1000
-    },
-    {
-      "action": "waitFor",
-      "selector": "button:has-text('확인했어요')",
-      "state": "visible",
-      "description": "정보 확인 바텀시트 대기"
+      "timeout": 500
     },
     {
       "action": "click",
-      "selector": "button:has-text('확인했어요')",
-      "description": "'확인했어요' 클릭"
+      "selector": "button:has-text('다음')",
+      "description": "'다음' 클릭 (방식)"
     },
     {
       "action": "waitForTimeout",

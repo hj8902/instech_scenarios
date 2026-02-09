@@ -9,14 +9,13 @@
     "userId",
     "userName",
     "userPhone",
-    "userBirthDate",
-    "userGender"
+    "userBirthDate"
   ],
   "defaults": {
     "entryType": "OTHER"
   },
-  "precondition": "유저 프로필에 성별 정보가 있는 상태",
-  "description": "정보 수정 → 잘못된 전화번호 → 에러 메시지 확인",
+  "precondition": "유저 프로필에 성별 정보가 없는 상태",
+  "description": "만나서 상담 → 서울 강남 → 정보 수정 → 잘못된 전화번호 → 에러 메시지 확인",
   "steps": [
     {
       "action": "loadState",
@@ -45,9 +44,9 @@
         "name": "{{userName}}",
         "phoneNumber": "{{userPhone}}",
         "birthDate": "{{userBirthDate}}",
-        "gender": "{{userGender}}"
+        "gender": ""
       },
-      "description": "유저 정보를 store에 주입"
+      "description": "유저 정보를 store에 주입 (gender X — 성별 미입력)"
     },
     {
       "action": "click",
@@ -69,23 +68,70 @@
     },
     {
       "action": "click",
+      "selector": ":text('만나서 상담')",
+      "description": "'만나서 상담' 선택"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 500
+    },
+    {
+      "action": "click",
       "selector": "button:has-text('다음')",
-      "description": "'다음' 클릭 (방식 — 만나서 상담 기본 선택)"
+      "description": "'다음' 클릭 (방식)"
     },
     {
       "action": "waitForTimeout",
       "timeout": 1000
     },
     {
-      "action": "waitFor",
-      "selector": "button:has-text('확인했어요')",
-      "state": "visible",
-      "description": "정보 확인 바텀시트 대기"
+      "action": "waitForNavigation",
+      "description": "일정 선택 페이지 로딩 대기"
     },
     {
       "action": "click",
-      "selector": "button:has-text('정보 수정')",
-      "description": "'정보 수정' 클릭"
+      "selector": ":text('편한 지역을 선택해주세요')",
+      "description": "지역 선택 셀렉터 클릭"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 1000
+    },
+    {
+      "action": "click",
+      "selector": ":text('서울')",
+      "description": "'서울' 선택"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 500
+    },
+    {
+      "action": "click",
+      "selector": ":text('강남구')",
+      "description": "'강남구' 선택"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 1000
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text('시간 상관없음')",
+      "description": "'시간 상관없음' 시간대 선택"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 500
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text('다음')",
+      "description": "'다음' 클릭 (일정)"
+    },
+    {
+      "action": "waitForTimeout",
+      "timeout": 1000
     },
     {
       "action": "waitForNavigation",
