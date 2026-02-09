@@ -94,9 +94,9 @@
     },
     {
       "action": "expect",
-      "type": "disabled",
+      "type": "hidden",
       "selector": "button:has-text('다음')",
-      "description": "'다음' 버튼 disabled 확인 (지역 미선택)"
+      "description": "'다음' 버튼 미노출 확인 (지역 미선택)"
     }
   ],
   "category": "edge"

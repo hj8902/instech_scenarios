@@ -140,8 +140,8 @@
     {
       "action": "fill",
       "selector": "input[placeholder='생년월일']",
-      "value": "900230",
-      "description": "존재하지 않는 생년월일 입력 (2월30일)"
+      "value": "901301",
+      "description": "존재하지 않는 생년월일 입력 (13월)"
     },
     {
       "action": "fill",
