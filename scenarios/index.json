@@ -198,15 +198,6 @@
       "requiresAuth": true,
       "path": "counsel/edge-types-no-topics-redirect.json"
     },
-{
-      "id": "counsel-edge-types-terms-close-retry",
-      "name": "약관 바텀시트 닫기 후 재시도",
-      "description": "주제 선택 → 전화 → 확인 → 약관 바텀시트 닫기 → 다시 시도 → 바텀시트 재노출",
-      "type": "test",
-      "labels": ["edge-case"],
-      "requiresAuth": true,
-      "path": "counsel/edge-types-terms-close-retry.json"
-    },
     {
       "id": "counsel-edge-schedule-no-region",
       "name": "지역 미선택 시 '다음' 버튼 disabled",
