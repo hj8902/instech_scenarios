@@ -1,0 +1,274 @@
+{
+  "version": "1.4.0",
+  "basePageUrl": "https://hj8902.github.io/instech_scenarios",
+  "scenarios": [
+    {
+      "id": "login",
+      "name": "로그인",
+      "description": "인증이 필요한 시나리오의 전제조건. 로그인 후 인증 상태를 저장합니다.",
+      "type": "setup",
+      "path": "_setup/login.json"
+    },
+    {
+      "id": "age-calc-landing-to-input",
+      "name": "Landing → Input 리다이렉트 (신규 유저)",
+      "description": "생년월일이 저장되지 않은 상태에서 Landing 페이지 접속 시 Input 페이지로 리다이렉트되는지 확인합니다.",
+      "type": "test",
+      "labels": ["happy-path"],
+      "requiresAuth": true,
+      "path": "age-calculation/landing-redirect-to-input.json"
+    },
+    {
+      "id": "age-calc-landing-to-result",
+      "name": "Landing → Result 리다이렉트 (기존 유저)",
+      "description": "생년월일이 이미 저장된 상태에서 Landing 페이지 접속 시 Result 페이지로 리다이렉트되는지 확인합니다.",
+      "type": "test",
+      "labels": ["happy-path"],
+      "requiresAuth": true,
+      "path": "age-calculation/landing-redirect-to-result.json"
+    },
+    {
+      "id": "age-calc-input-to-result",
+      "name": "생년월일 입력 → 결과 확인",
+      "description": "생년월일 입력 후 보험나이, 보험 나이 오르는 날, 보험료 비교 결과를 확인합니다.",
+      "type": "test",
+      "labels": ["happy-path"],
+      "requiresAuth": true,
+      "path": "age-calculation/input-to-result.json"
+    },
+    {
+      "id": "age-calc-invalid-birthdate",
+      "name": "잘못된 생년월일 입력",
+      "description": "존재하지 않는 날짜(13월, 윤년 아닌 2/29 등)를 입력하면 에러 메시지가 표시되고, 올바른 값 입력 시 에러가 사라지는지 확인합니다.",
+      "type": "test",
+      "labels": ["edge-case"],
+      "requiresAuth": true,
+      "path": "age-calculation/invalid-birthdate.json"
+    },
+    {
+      "id": "age-calc-terms-masking-new",
+      "name": "약관 미동의 시 마스킹 (신규 세션)",
+      "description": "약관 미동의 상태에서 결과 페이지 접속 시 보험나이가 '??'로 마스킹되고, 약관 동의 바텀시트가 노출되며, 동의 후 실제 데이터가 표시되는지 확인합니다.",
+      "type": "test",
+      "labels": ["happy-path"],
+      "requiresAuth": true,
+      "path": "age-calculation/terms-masking-new.json"
+    },
+    {
+      "id": "age-calc-terms-masking-agreed",
+      "name": "약관 동의 후 결과 표시 (기존 세션)",
+      "description": "약관에 이미 동의한 상태에서 결과 페이지 접속 시 바텀시트 없이 실제 보험 나이가 바로 표시되는지 확인합니다.",
+      "type": "test",
+      "labels": ["happy-path"],
+      "requiresAuth": true,
+      "path": "age-calculation/terms-masking-agreed.json"
+    },
+    {
+      "id": "age-calc-edit-birthdate",
+      "name": "생년월일 수정",
+      "description": "결과 페이지에서 생년월일을 수정하고 결과가 갱신되는지 확인합니다.",
+      "type": "test",
+      "labels": ["happy-path"],
+      "requiresAuth": true,
+      "path": "age-calculation/edit-birthdate.json"
+    },
+    {
+      "id": "counsel-inperson-gender-o-terms-agreed",
+      "name": "대면 (유저 정보 있음, 약관 동의됨)",
+      "description": "주제 선택 → 대면 상담 선택 → 지역/일정 선택 → 정보 확인 → 상담 신청 완료",
+      "type": "test",
+      "labels": ["happy-path", "inperson", "gender-o", "terms-agreed"],
+      "requiresAuth": true,
+      "path": "counsel/inperson-gender-o-terms-agreed.json"
+    },
+    {
+      "id": "counsel-inperson-gender-o-terms-new",
+      "name": "대면 (유저 정보 있음, 약관 미동의)",
+      "description": "주제 선택 → 대면 상담 선택 → 지역/일정 선택 → 정보 확인 → 약관 동의 → 상담 신청 완료",
+      "type": "test",
+      "labels": ["happy-path", "inperson", "gender-o", "terms-new"],
+      "requiresAuth": true,
+      "path": "counsel/inperson-gender-o-terms-new.json"
+    },
+    {
+      "id": "counsel-inperson-gender-x-terms-agreed",
+      "name": "대면 (성별 미입력, 약관 동의됨)",
+      "description": "주제 선택 → 대면 상담 선택 → 지역/일정 선택 → 정보 수정 → 상담 신청 완료",
+      "type": "test",
+      "labels": ["happy-path", "inperson", "gender-x", "terms-agreed"],
+      "requiresAuth": true,
+      "path": "counsel/inperson-gender-x-terms-agreed.json"
+    },
+    {
+      "id": "counsel-inperson-gender-x-terms-new",
+      "name": "대면 (성별 미입력, 약관 미동의)",
+      "description": "주제 선택 → 대면 상담 선택 → 지역/일정 선택 → 정보 수정 → 약관 동의 → 상담 신청 완료",
+      "type": "test",
+      "labels": ["happy-path", "inperson", "gender-x", "terms-new"],
+      "requiresAuth": true,
+      "path": "counsel/inperson-gender-x-terms-new.json"
+    },
+    {
+      "id": "counsel-phone-gender-o-terms-agreed",
+      "name": "전화 (유저 정보 있음, 약관 동의됨)",
+      "description": "주제 선택 → 전화 상담 선택 → 정보 확인 → 상담 신청 완료",
+      "type": "test",
+      "labels": ["happy-path", "phone", "gender-o", "terms-agreed"],
+      "requiresAuth": true,
+      "path": "counsel/phone-gender-o-terms-agreed.json"
+    },
+    {
+      "id": "counsel-phone-gender-o-terms-new",
+      "name": "전화 (유저 정보 있음, 약관 미동의)",
+      "description": "주제 선택 → 전화 상담 선택 → 정보 확인 → 약관 동의 → 상담 신청 완료",
+      "type": "test",
+      "labels": ["happy-path", "phone", "gender-o", "terms-new"],
+      "requiresAuth": true,
+      "path": "counsel/phone-gender-o-terms-new.json"
+    },
+    {
+      "id": "counsel-phone-gender-x-terms-agreed",
+      "name": "전화 (성별 미입력, 약관 동의됨)",
+      "description": "주제 선택 → 전화 상담 선택 → 정보 수정 → 상담 신청 완료",
+      "type": "test",
+      "labels": ["happy-path", "phone", "gender-x", "terms-agreed"],
+      "requiresAuth": true,
+      "path": "counsel/phone-gender-x-terms-agreed.json"
+    },
+    {
+      "id": "counsel-phone-gender-x-terms-new",
+      "name": "전화 (성별 미입력, 약관 미동의)",
+      "description": "주제 선택 → 전화 상담 선택 → 정보 수정 → 약관 동의 → 상담 신청 완료",
+      "type": "test",
+      "labels": ["happy-path", "phone", "gender-x", "terms-new"],
+      "requiresAuth": true,
+      "path": "counsel/phone-gender-x-terms-new.json"
+    },
+    {
+      "id": "counsel-chat-gender-o-terms-agreed",
+      "name": "카카오톡 (유저 정보 있음, 약관 동의됨)",
+      "description": "주제 선택 → 카카오톡 상담 선택 → 정보 확인 → 상담 신청 완료",
+      "type": "test",
+      "labels": ["happy-path", "kakao", "gender-o", "terms-agreed"],
+      "requiresAuth": true,
+      "path": "counsel/chat-gender-o-terms-agreed.json"
+    },
+    {
+      "id": "counsel-chat-gender-o-terms-new",
+      "name": "카카오톡 (유저 정보 있음, 약관 미동의)",
+      "description": "주제 선택 → 카카오톡 상담 선택 → 정보 확인 → 약관 동의 → 상담 신청 완료",
+      "type": "test",
+      "labels": ["happy-path", "kakao", "gender-o", "terms-new"],
+      "requiresAuth": true,
+      "path": "counsel/chat-gender-o-terms-new.json"
+    },
+    {
+      "id": "counsel-chat-gender-x-terms-agreed",
+      "name": "카카오톡 (성별 미입력, 약관 동의됨)",
+      "description": "주제 선택 → 카카오톡 상담 선택 → 정보 수정 → 상담 신청 완료",
+      "type": "test",
+      "labels": ["happy-path", "kakao", "gender-x", "terms-agreed"],
+      "requiresAuth": true,
+      "path": "counsel/chat-gender-x-terms-agreed.json"
+    },
+    {
+      "id": "counsel-chat-gender-x-terms-new",
+      "name": "카카오톡 (성별 미입력, 약관 미동의)",
+      "description": "주제 선택 → 카카오톡 상담 선택 → 정보 수정 → 약관 동의 → 상담 신청 완료",
+      "type": "test",
+      "labels": ["happy-path", "kakao", "gender-x", "terms-new"],
+      "requiresAuth": true,
+      "path": "counsel/chat-gender-x-terms-new.json"
+    },
+    {
+      "id": "counsel-state-setup-assign-target-ga",
+      "name": "원하는 GA 배정 후 상담 신청",
+      "description": "원하는 GA가 배정될 때까지 반복 후 전화 상담 신청 완료 (최대 20회)",
+      "type": "state-setup",
+      "labels": ["phone", "gender-o", "terms-agreed"],
+      "requiresAuth": true,
+      "path": "counsel/state-setup-assign-target-ga.json"
+    },
+    {
+      "id": "counsel-edge-topics-button-state",
+      "name": "주제 미선택/해제 시 '다음' 버튼 disabled",
+      "description": "주제 0개 → 버튼 disabled → 선택 → enabled → 해제 → disabled",
+      "type": "test",
+      "labels": ["edge-case"],
+      "requiresAuth": true,
+      "path": "counsel/edge-topics-button-state.json"
+    },
+    {
+      "id": "counsel-edge-types-no-topics-redirect",
+      "name": "topics 없이 types 직접 접근 시 리다이렉트",
+      "description": "/counsel/types 직접 접근 → topics 페이지로 리다이렉트",
+      "type": "test",
+      "labels": ["edge-case"],
+      "requiresAuth": true,
+      "path": "counsel/edge-types-no-topics-redirect.json"
+    },
+    {
+      "id": "counsel-edge-schedule-no-region",
+      "name": "지역 미선택 시 '다음' 버튼 disabled",
+      "description": "일정 선택 페이지 → 지역 미선택 → '다음' disabled 확인",
+      "type": "test",
+      "labels": ["edge-case", "inperson"],
+      "requiresAuth": true,
+      "path": "counsel/edge-schedule-no-region.json"
+    },
+    {
+      "id": "counsel-edge-schedule-sejong",
+      "name": "세종특별자치시 선택 시 시/군/구 선택 생략",
+      "description": "일정 선택 → 세종특별자치시 → 시/군/구 없이 바로 진행",
+      "type": "test",
+      "labels": ["edge-case", "inperson"],
+      "requiresAuth": true,
+      "path": "counsel/edge-schedule-sejong.json"
+    },
+    {
+      "id": "counsel-edge-user-edit-name-validation",
+      "name": "이름 필드 유효성 검증 (한영 혼합, 자모)",
+      "description": "정보 수정 → 한영 혼합 이름 → 에러 → 자모 이름 → 에러",
+      "type": "test",
+      "labels": ["edge-case"],
+      "requiresAuth": true,
+      "path": "counsel/edge-user-edit-name-validation.json"
+    },
+    {
+      "id": "counsel-edge-user-edit-phone-validation",
+      "name": "전화번호 필드 유효성 검증",
+      "description": "정보 수정 → 잘못된 전화번호 → 에러 메시지 확인",
+      "type": "test",
+      "labels": ["edge-case"],
+      "requiresAuth": true,
+      "path": "counsel/edge-user-edit-phone-validation.json"
+    },
+    {
+      "id": "counsel-edge-user-edit-birth-gender-validation",
+      "name": "생년월일/성별 유효성 검증 (존재하지 않는 날짜, 불일치)",
+      "description": "정보 수정 → 존재하지 않는 생년월일 → 에러 → 생년월일-성별 불일치 → 에러",
+      "type": "test",
+      "labels": ["edge-case"],
+      "requiresAuth": true,
+      "path": "counsel/edge-user-edit-birth-gender-validation.json"
+    },
+    {
+      "id": "counsel-edge-user-edit-submit-disabled",
+      "name": "'다음' 버튼 disabled 상태 (미수정/에러)",
+      "description": "정보 수정 → 변경 없음 → disabled → 잘못된 입력 → disabled",
+      "type": "test",
+      "labels": ["edge-case"],
+      "requiresAuth": true,
+      "path": "counsel/edge-user-edit-submit-disabled.json"
+    },
+    {
+      "id": "counsel-edge-user-edit-invalid-type-redirect",
+      "name": "잘못된 type 파라미터로 user-edit 접근 시 리다이렉트",
+      "description": "/counsel/user-edit/invalid 접근 → types 또는 topics으로 리다이렉트",
+      "type": "test",
+      "labels": ["edge-case"],
+      "requiresAuth": true,
+      "path": "counsel/edge-user-edit-invalid-type-redirect.json"
+    }
+  ]
+}
