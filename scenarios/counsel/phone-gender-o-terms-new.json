@@ -92,6 +92,12 @@
       "description": "'전화' 상담 방식 선택"
     },
     {
+      "action": "expect",
+      "type": "visible",
+      "selector": ":text('이동 없이 전화로 간단히 상담해요')",
+      "description": "'전화' 선택 상태 확인"
+    },
+    {
       "action": "waitForTimeout",
       "timeout": 500
     },

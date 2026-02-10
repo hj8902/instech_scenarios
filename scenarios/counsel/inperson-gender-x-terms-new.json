@@ -85,6 +85,12 @@
       "description": "'만나서 상담' 상담 방식 선택"
     },
     {
+      "action": "expect",
+      "type": "visible",
+      "selector": ":text('보험 점검에 추천드려요')",
+      "description": "'만나서 상담' 선택 상태 확인"
+    },
+    {
       "action": "waitForTimeout",
       "timeout": 500
     },

@@ -91,6 +91,12 @@
       "description": "'카카오톡' 상담 방식 선택"
     },
     {
+      "action": "expect",
+      "type": "visible",
+      "selector": ":text('채팅으로 부담 없이 질문해요')",
+      "description": "'카카오톡' 선택 상태 확인"
+    },
+    {
       "action": "waitForTimeout",
       "timeout": 500
     },
