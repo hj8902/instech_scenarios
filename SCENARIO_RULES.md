@@ -1,5 +1,13 @@
 # 시나리오 작성 규칙
 
+## 시나리오 타입
+
+| type | 설명 | 뷰어 배지 |
+|------|------|-----------|
+| `setup` | 로그인 등 사전설정 시나리오 | 사전설정 |
+| `test` | 동작 검증 시나리오 (happy-path, edge-case) | (없음) |
+| `state-setup` | 특정 상태를 만들기 위한 시나리오 (예: 원하는 GA 배정) | 상태설정 |
+
 ## 시나리오 분류
 
 ### Happy Path
@@ -116,3 +124,37 @@ topics → types → 다음 → [GA check] → user-edit (직접 진입) → ...
 ### blur 필수
 - `fill()` 후 validation을 트리거하려면 반드시 `blur()` 호출
 - Playwright의 `fill()`은 blur 이벤트를 발생시키지 않음
+
+## 전처리 액션
+
+### cancelExistingCounsel
+- **용도**: 상담 완료까지 진행하는 시나리오에서, 기존 상담 신청이 남아있으면 충돌하므로 사전에 취소
+- **동작**: `/car-insurance/history` 페이지에서 "상담 취소하기" 버튼 → 모달 "상담 취소" 버튼으로 모든 기존 상담 취소
+- **필수 속성**: `baseUrl` — 테스트 환경 URL
+- **적용 대상**: 상담 신청 완료까지 진행하는 모든 해피패스/상태설정 시나리오
+- **배치 위치**: `loadState` 바로 다음
+
+```json
+{
+  "action": "cancelExistingCounsel",
+  "baseUrl": "{{baseUrl}}",
+  "description": "기존 상담 신청이 있으면 취소"
+}
+```
+
+### retryUntilGa
+- **용도**: 원하는 GA(보험대리점)가 배정될 때까지 반복 시도
+- **동작**: "다음" 버튼 클릭 → `/available-ga` API 응답 확인 → 불일치 시 뒤로가기 → 재시도 (최대 N회)
+- **필수 속성**: `targetGaCompanyId` — 원하는 GA ID (6=한화, 7=링크투테크놀로지스)
+- **선택 속성**: `maxRetries` (기본 20), `clickSelector` (기본 `button:has-text('다음')`)
+- **주의**: `targetGaCompanyId`는 변수 치환 후 문자열이 되므로 러너에서 int 변환 처리
+
+```json
+{
+  "action": "retryUntilGa",
+  "targetGaCompanyId": "{{targetGaCompanyId}}",
+  "clickSelector": "button:has-text('다음')",
+  "maxRetries": 20,
+  "description": "원하는 GA가 배정될 때까지 '다음' 버튼 반복 클릭"
+}
+```
