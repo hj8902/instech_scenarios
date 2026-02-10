@@ -211,8 +211,8 @@
     },
     {
       "action": "click",
-      "selector": "button:has-text('수정 완료')",
-      "description": "'수정 완료' 버튼 클릭"
+      "selector": "button:has-text('다음')",
+      "description": "'다음' 버튼 클릭 (정보 수정)"
     },
     {
       "action": "waitForTimeout",
