@@ -181,6 +181,15 @@
       "path": "counsel/chat-gender-x-terms-new.json"
     },
     {
+      "id": "counsel-state-setup-assign-target-ga",
+      "name": "원하는 GA 배정 후 상담 신청",
+      "description": "원하는 GA가 배정될 때까지 반복 후 전화 상담 신청 완료 (최대 20회)",
+      "type": "state-setup",
+      "labels": ["phone", "gender-o", "terms-agreed"],
+      "requiresAuth": true,
+      "path": "counsel/state-setup-assign-target-ga.json"
+    },
+    {
       "id": "counsel-edge-topics-button-state",
       "name": "주제 미선택/해제 시 '다음' 버튼 disabled",
       "description": "주제 0개 → 버튼 disabled → 선택 → enabled → 해제 → disabled",

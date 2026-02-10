@@ -16,6 +16,8 @@
     --happy-bg: #ecfdf5;
     --edge: #d97706;
     --edge-bg: #fffbeb;
+    --state-setup: #0891b2;
+    --state-setup-bg: #ecfeff;
     --border: #e5e7eb;
     --text: #1f2937;
     --text-light: #6b7280;
@@ -248,6 +250,7 @@
   .badge.auth { background: #fef3c7; color: #92400e; }
   .badge.happy { background: var(--happy-bg); color: var(--happy); }
   .badge.edge { background: var(--edge-bg); color: var(--edge); }
+  .badge.state-setup { background: var(--state-setup-bg); color: var(--state-setup); }
 
   .card-title {
     font-size: 14px;
@@ -574,7 +577,7 @@ function renderNav() {
     // Category breakdown
     const catGroups = {};
     scenarios.forEach(s => {
-      const cat = s.category || (s.type === 'setup' ? null : 'happy');
+      const cat = s.category || (s.type === 'setup' || s.type === 'state-setup' ? null : 'happy');
       if (cat) {
         if (!catGroups[cat]) catGroups[cat] = [];
         catGroups[cat].push(s);
@@ -661,7 +664,7 @@ function renderContent(scenarios, title, breadcrumb, filterCat) {
     if (!filterCat) {
       const catGroups = {};
       scenarios.forEach(s => {
-        const cat = s.category || (s.type === 'setup' ? 'setup' : 'happy');
+        const cat = s.category || (s.type === 'setup' || s.type === 'state-setup' ? 'setup' : 'happy');
         if (!catGroups[cat]) catGroups[cat] = [];
         catGroups[cat].push(s);
       });
@@ -693,6 +696,8 @@ function renderContent(scenarios, title, breadcrumb, filterCat) {
 function renderCard(s, showCategoryBadge) {
   const typeBadge = s.type === 'setup'
     ? '<span class="badge setup">사전설정</span>'
+    : s.type === 'state-setup'
+    ? '<span class="badge state-setup">상태설정</span>'
     : '';
   const authBadge = s.requiresAuth ? '<span class="badge auth">로그인 필요</span>' : '';
   const catBadge = showCategoryBadge && s.category
