@@ -66,7 +66,7 @@
     {
       "action": "click",
       "selector": "button:has-text('다음')",
-      "description": "'다음' 버튼 클릭 (주제)"
+      "description": "'다음' 버튼 클릭 (주제 → types)"
     },
     {
       "action": "waitForNavigation",
@@ -82,30 +82,31 @@
       "timeout": 500
     },
     {
-      "action": "retryUntilGa",
-      "targetGaCompanyId": "{{targetGaCompanyId}}",
-      "clickSelector": "button:has-text('다음')",
-      "maxRetries": 20,
-      "description": "원하는 GA가 배정될 때까지 '다음' 버튼 반복 클릭"
+      "action": "click",
+      "selector": "button:has-text('다음')",
+      "description": "'다음' 버튼 클릭 (types → capacity 확인 → ConfirmBottomSheet)"
     },
     {
       "action": "waitForTimeout",
-      "timeout": 1000
+      "timeout": 1500,
+      "description": "capacity API 응답 대기"
     },
     {
       "action": "waitFor",
       "selector": "button:has-text('확인했어요')",
       "state": "visible",
-      "description": "정보 확인 바텀시트 대기"
+      "description": "ConfirmBottomSheet 대기"
     },
     {
       "action": "screenshot",
-      "description": "정보 확인 바텀시트 스크린샷"
+      "description": "ConfirmBottomSheet 스크린샷"
     },
     {
-      "action": "click",
-      "selector": "button:has-text('확인했어요')",
-      "description": "'확인했어요' 버튼 클릭"
+      "action": "retryUntilGa",
+      "targetGaCompanyId": "{{targetGaCompanyId}}",
+      "clickSelector": "button:has-text('확인했어요')",
+      "maxRetries": 20,
+      "description": "원하는 GA 배정까지 '확인했어요' 반복 (available-ga 인터셉트)"
     },
     {
       "action": "waitForTimeout",
