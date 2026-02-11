@@ -2,7 +2,6 @@
 """
 instech 시나리오 범용 러너
 - 시나리오 JSON을 읽어서 모든 step을 자동으로 Playwright 코드로 변환/실행
-- 전체 시나리오 실행 및 특정 시나리오 반복 실행 지원
 - 병렬 실행 지원 (MAX_WORKERS 설정 가능)
 """
 
@@ -10,6 +9,7 @@ import glob
 import json
 import os
 import re
+import time
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from playwright.sync_api import sync_playwright
@@ -22,7 +22,9 @@ ACTION_SETTLE_MS = 200  # React 상태 커밋 대기 (fill/blur/click/clear 후)
 # ── JSON fetch ──
 
 def fetch_json(url):
-    req = urllib.request.Request(url, headers={"User-Agent": "scenario-runner"})
+    # GitHub Pages CDN 캐시 우회
+    cache_bust = f"?_={int(time.time())}"
+    req = urllib.request.Request(url + cache_bust, headers={"User-Agent": "scenario-runner"})
     with urllib.request.urlopen(req) as resp:
         return json.loads(resp.read().decode("utf-8"))
 
@@ -220,10 +222,12 @@ def execute_step(page, step, context):
         return {"status": "pass", "desc": desc}
 
     elif action == "handleTermsAgreement":
-        fallback = step.get("fallback", "")
+        required = step.get("required", False)
         result_msg = handle_terms(page)
-        if "비활성" in result_msg and fallback != "skip":
+        if "비활성" in result_msg:
             return {"status": "fail", "desc": f"{desc} — {result_msg}"}
+        if "미노출" in result_msg and required:
+            return {"status": "fail", "desc": f"{desc} — 바텀시트가 나타나야 하나 미노출 (required=true)"}
         return {"status": "pass", "desc": f"{desc} — {result_msg}"}
 
     elif action == "injectStoreData":
@@ -240,13 +244,25 @@ def execute_step(page, step, context):
     elif action == "fetchAndInjectUserInfo":
         store = step.get("store", "")
         store_var = f"__{'COUNSEL' if store == 'COUNSEL' else store}_STORE__"
-        page.evaluate(f"""async () => {{
-            const resp = await fetch('/api/proxy/instech/v1/me');
-            const json = await resp.json();
-            const store = window.{store_var};
-            if (store) store.setState({{ userInfo: json.data }});
+        user_data = step.get("userData")
+        if not user_data:
+            return {"status": "fail", "desc": desc, "error": "userData 필드가 없습니다. 시나리오에 userData를 추가하세요."}
+        js_data = json.dumps(user_data, ensure_ascii=False)
+        result = page.evaluate(f"""() => {{
+            try {{
+                const store = window.{store_var};
+                if (!store) return {{ error: 'window.{store_var} not found' }};
+                store.setState({{ userInfo: {js_data} }});
+                return {{ ok: true }};
+            }} catch (e) {{
+                return {{ error: String(e) }};
+            }}
         }}""")
-        return {"status": "pass", "desc": desc}
+        if result and result.get("error"):
+            return {"status": "fail", "desc": f"{desc} — {result['error']}"}
+        name = user_data.get("name", "?")
+        gender = user_data.get("gender", "(없음)")
+        return {"status": "pass", "desc": f"{desc} [name={name}, gender={gender or '(없음)'}]"}
 
     elif action == "setSessionStorage":
         key = step.get("key", "")
@@ -266,6 +282,105 @@ def execute_step(page, step, context):
     elif action == "launchBrowser":
         # 브라우저 재실행은 러너 레벨에서 처리
         return {"status": "pass", "desc": desc}
+
+    elif action == "retryUntilGa":
+        target_ga_id_raw = step.get("targetGaCompanyId")
+        max_retries = step.get("maxRetries", 20)
+        click_selector = step.get("clickSelector", "button:has-text('확인했어요')")
+
+        if not target_ga_id_raw:
+            return {"status": "fail", "desc": desc, "error": "targetGaCompanyId가 지정되지 않았습니다."}
+
+        # 변수 치환 후 문자열이 되므로 int 변환 (API 응답은 정수)
+        try:
+            target_ga_id = int(target_ga_id_raw)
+        except (ValueError, TypeError):
+            return {"status": "fail", "desc": desc, "error": f"targetGaCompanyId가 숫자가 아닙니다: {target_ga_id_raw}"}
+
+        for attempt in range(1, max_retries + 1):
+            matched = [False]
+            ga_id_found = [None]
+            ga_name_found = [None]
+
+            def handle_route(route):
+                """available-ga 응답을 인터셉트하여 GA ID 확인.
+                매칭 시 응답을 그대로 전달 (→ onSuccess → complete 이동).
+                불일치 시 abort (→ onError → ConfirmBottomSheet 유지 → 재클릭).
+                """
+                try:
+                    response = route.fetch()
+                    body = response.json()
+                    ga_id = body.get("data", {}).get("gaCompanyId")
+                    ga_name_found[0] = body.get("data", {}).get("gaCompanyName", "")
+                    ga_id_found[0] = ga_id
+                    if ga_id == target_ga_id:
+                        matched[0] = True
+                        route.fulfill(response=response)
+                    else:
+                        route.abort()
+                except Exception:
+                    route.abort()
+
+            page.route("**/available-ga**", handle_route)
+
+            try:
+                page.locator(click_selector).first.click()
+                page.wait_for_timeout(1500)
+            except Exception as e:
+                page.unroute("**/available-ga**")
+                return {"status": "fail", "desc": desc, "error": f"클릭 실패: {e}"}
+
+            page.unroute("**/available-ga**")
+
+            if matched[0]:
+                return {"status": "pass", "desc": f"{desc} — {attempt}회차에 GA 매칭 (id={ga_id_found[0]}, {ga_name_found[0]})"}
+
+            # GA 불일치 — abort로 onError 발생, ConfirmBottomSheet 유지
+            print(f"    [{attempt}/{max_retries}] GA 불일치: id={ga_id_found[0]} ({ga_name_found[0]})")
+            page.wait_for_timeout(500)
+
+        return {"status": "fail", "desc": desc, "error": f"{max_retries}회 시도 후 원하는 GA(id={target_ga_id})를 배정받지 못함"}
+
+    elif action == "cancelExistingCounsel":
+        base_url = step.get("baseUrl", "")
+        page.goto(f"{base_url}/car-insurance/history")
+        page.wait_for_load_state("networkidle")
+        page.wait_for_timeout(1000)
+
+        # 상담 없으면 history.back()으로 이동하므로 URL로 판별
+        if "/car-insurance/history" not in page.url:
+            return {"status": "pass", "desc": f"{desc} — 기존 상담 없음 (skip)"}
+
+        # 상담 항목 있음 — 모든 "상담 취소하기" 버튼 클릭
+        cancelled = 0
+        max_attempts = 10
+        for _ in range(max_attempts):
+            cancel_btn = page.locator("button:has-text('상담 취소하기')").first
+            try:
+                cancel_btn.wait_for(state="visible", timeout=3000)
+            except Exception:
+                break  # 더 이상 취소할 항목 없음
+
+            cancel_btn.click()
+            page.wait_for_timeout(500)
+
+            # 모달 "상담 취소" 버튼 클릭
+            modal = page.locator("[role='dialog'], [aria-modal='true']")
+            if modal.count() > 0:
+                confirm_btn = modal.locator("button:has-text('상담 취소')").first
+                try:
+                    confirm_btn.wait_for(state="visible", timeout=3000)
+                    confirm_btn.click()
+                    page.wait_for_timeout(1500)  # API 응답 + 리스트 갱신 대기
+                    cancelled += 1
+                except Exception:
+                    break
+
+            # 상담 전부 취소되면 history.back() 발생
+            if "/car-insurance/history" not in page.url:
+                break
+
+        return {"status": "pass", "desc": f"{desc} — {cancelled}건 취소"}
 
     elif action == "manualAction":
         instruction = step.get("instruction", "")
@@ -335,9 +450,7 @@ def run_scenario(browser, scenario, variables, auth_state_path, screenshot_prefi
 
         if result["status"] == "fail":
             scenario_status = "fail"
-            # 세션 만료 시 즉시 중단
-            if "세션 만료" in result.get("error", ""):
-                break
+            break  # 실패 시 이후 스텝은 의미 없으므로 즉시 중단
 
     ctx.close()
     return {
@@ -372,18 +485,97 @@ def _run_worker_batch(batch):
 
 # ── 전체 실행 / 반복 실행 ──
 
-def run_all(base_url, feature_path, auth_state_path, category=None, extra_vars=None):
-    """특정 기능의 전체 시나리오 실행. 2개 이상이면 병렬 실행."""
+def _matches_labels(scenario_labels, filter_labels):
+    """라벨 필터 매칭. 각 filter_label 간은 AND, 쉼표로 구분된 값은 OR.
+    예: ["happy-path", "inperson,phone"] → happy-path AND (inperson OR phone)
+    """
+    for fl in filter_labels:
+        alternatives = [x.strip() for x in fl.split(",")]
+        if not any(alt in scenario_labels for alt in alternatives):
+            return False
+    return True
+
+
+def _run_parallel(tasks, auth_state_path):
+    """태스크 리스트를 MAX_WORKERS 만큼 병렬 실행하고 결과 리스트 반환."""
+    total = len(tasks)
+    workers = min(MAX_WORKERS, total)
+    for i, task in enumerate(tasks):
+        task["index"] = i
+
+    batches = [{"auth_state_path": auth_state_path, "items": []} for _ in range(workers)]
+    for i, task in enumerate(tasks):
+        batches[i % workers]["items"].append(task)
+
+    results = [None] * total
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        futures = [executor.submit(_run_worker_batch, batch) for batch in batches]
+        for future in as_completed(futures):
+            try:
+                for idx, result in future.result():
+                    results[idx] = result
+            except Exception as e:
+                print(f"  워커 에러: {e}")
+    return results
+
+
+def _pre_cancel_counsel(browser, base_url, auth_state_path):
+    """엣지 케이스 그룹 실행 전 기존 상담 1회 취소"""
+    print(f"\n{'='*50}")
+    print(f"[전처리] 엣지 케이스 실행 전 기존 상담 취소")
+    print(f"{'='*50}")
+    try:
+        ctx = browser.new_context(storage_state=auth_state_path)
+        page = ctx.new_page()
+        page.set_default_timeout(10000)
+        step = {"action": "cancelExistingCounsel", "baseUrl": base_url, "description": "엣지 케이스 전처리 — 기존 상담 취소"}
+        context = {"screenshot_path": None, "auth_state_path": auth_state_path, "browser_context": ctx, "step_num": 0}
+        result = execute_step(page, step, context)
+        icon = "OK" if result["status"] == "pass" else "FAIL"
+        print(f"  [{icon}] {result['desc']}")
+        ctx.close()
+    except Exception as e:
+        print(f"  [FAIL] 상담 취소 실패: {e}")
+        try:
+            ctx.close()
+        except Exception:
+            pass
+
+
+def run_all(base_url, feature_path, auth_state_path, category=None, extra_vars=None, labels=None):
+    """특정 기능의 전체 시나리오 실행.
+    counsel 기능은 상담 충돌 방지를 위해 단일 워커로 순차 실행.
+    labels: 라벨 필터 리스트. 각 항목 간 AND, 쉼표 구분 시 OR.
+      예: ["happy-path", "inperson,phone"] → happy-path AND (inperson OR phone)
+    """
     index = fetch_index()
     test_scenarios_meta = [
         s for s in index["scenarios"]
-        if s["type"] == "test" and s["path"].startswith(feature_path)
-        and (category is None or s.get("category", "happy") == category)
+        if s["type"] in ("test", "state-setup") and s["path"].startswith(feature_path)
+        and (labels is None or _matches_labels(s.get("labels", []), labels))
     ]
+
+    # ── 해피패스/엣지케이스 동시 실행 방지 ──
+    has_happy = any("happy-path" in s.get("labels", []) for s in test_scenarios_meta)
+    has_edge = any("edge-case" in s.get("labels", []) for s in test_scenarios_meta)
+    if has_happy and has_edge:
+        print("\n[ERROR] 해피패스와 엣지케이스를 동시에 실행할 수 없습니다.")
+        print("  → --label happy-path 또는 --label edge-case 를 추가하여 분리 실행하세요.")
+        print(f"  현재 필터: {labels}")
+        matched_names = [s["name"] for s in test_scenarios_meta]
+        print(f"  매칭된 시나리오 ({len(matched_names)}개):")
+        for name in matched_names:
+            print(f"    - {name}")
+        return []
 
     if not test_scenarios_meta:
         print("실행할 시나리오가 없습니다.")
         return []
+
+    # HTTPS 강제
+    if base_url.startswith("http://"):
+        base_url = base_url.replace("http://", "https://", 1)
+        print(f"[INFO] HTTP → HTTPS 자동 변환: {base_url}")
 
     # 시나리오 JSON 미리 fetch (병렬 실행 전)
     variables = {"baseUrl": base_url}
@@ -401,36 +593,67 @@ def run_all(base_url, feature_path, auth_state_path, category=None, extra_vars=N
             "scenario": scenario,
             "variables": dict(variables),
             "screenshot_prefix": f"/tmp/scenario_{scenario['id']}",
+            "labels": meta.get("labels", []),
         })
 
     total = len(tasks)
-    workers = min(MAX_WORKERS, total)
+    is_counsel = feature_path.startswith("counsel")
 
-    print(f"\n시나리오 {total}개 실행 (브라우저 {workers}개 병렬)")
+    # counsel: 해피패스(상담 생성)는 순차, 엣지케이스(UI 검증)는 병렬 가능
+    if is_counsel:
+        happy_tasks = [t for t in tasks if "edge-case" not in t.get("labels", [])]
+        edge_tasks = [t for t in tasks if "edge-case" in t.get("labels", [])]
+    else:
+        happy_tasks = tasks
+        edge_tasks = []
 
-    if total == 1:
+    all_results = []
+
+    # ── 해피패스/상태설정: 순차 실행 (상담 충돌 방지) ──
+    if happy_tasks:
+        if is_counsel:
+            print(f"\n[순차] 해피패스/상태설정 {len(happy_tasks)}개 실행 (브라우저 1개)")
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                for task in happy_tasks:
+                    result = run_scenario(browser, task["scenario"], task["variables"],
+                                          auth_state_path, task["screenshot_prefix"])
+                    all_results.append(result)
+                browser.close()
+        else:
+            workers = min(MAX_WORKERS, len(happy_tasks))
+            print(f"\n시나리오 {len(happy_tasks)}개 실행 (브라우저 {workers}개{' 순차' if workers == 1 else ' 병렬'})")
+            if workers == 1:
+                with sync_playwright() as p:
+                    browser = p.chromium.launch(headless=True)
+                    for task in happy_tasks:
+                        result = run_scenario(browser, task["scenario"], task["variables"],
+                                              auth_state_path, task["screenshot_prefix"])
+                        all_results.append(result)
+                    browser.close()
+            else:
+                all_results = _run_parallel(happy_tasks, auth_state_path)
+
+    # ── 엣지케이스: 병렬 실행 (상담 미생성, UI 검증만) ──
+    if edge_tasks:
+        workers = min(MAX_WORKERS, len(edge_tasks))
+        print(f"\n[병렬] 엣지케이스 {len(edge_tasks)}개 실행 (브라우저 {workers}개)")
+        # 첫 실행 전 기존 상담 1회 취소
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            result = run_scenario(browser, tasks[0]["scenario"], tasks[0]["variables"],
-                                  auth_state_path, tasks[0]["screenshot_prefix"])
+            _pre_cancel_counsel(browser, base_url, auth_state_path)
             browser.close()
-        all_results = [result]
-    else:
-        # 시나리오를 워커 수만큼 균등 분배 (라운드로빈)
-        batches = [{"auth_state_path": auth_state_path, "items": []} for _ in range(workers)]
-        for i, task in enumerate(tasks):
-            task["index"] = i
-            batches[i % workers]["items"].append(task)
-
-        all_results = [None] * total
-        with ThreadPoolExecutor(max_workers=workers) as executor:
-            futures = [executor.submit(_run_worker_batch, batch) for batch in batches]
-            for future in as_completed(futures):
-                try:
-                    for idx, result in future.result():
-                        all_results[idx] = result
-                except Exception as e:
-                    print(f"  워커 에러: {e}")
+        if workers == 1:
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                for task in edge_tasks:
+                    result = run_scenario(browser, task["scenario"], task["variables"],
+                                          auth_state_path, task["screenshot_prefix"])
+                    all_results.append(result)
+                browser.close()
+        else:
+            edge_results = _run_parallel(edge_tasks, auth_state_path)
+            all_results.extend(edge_results)
 
     # 요약
     print(f"\n{'='*50}")
@@ -458,60 +681,6 @@ def run_all(base_url, feature_path, auth_state_path, category=None, extra_vars=N
     return all_results
 
 
-def run_repeat(base_url, scenario_path, repeat_count, auth_state_path, extra_vars=None):
-    """특정 시나리오를 N회 반복 실행"""
-    scenario = fetch_scenario(scenario_path)
-    variables = {"baseUrl": base_url}
-    if scenario.get("defaults"):
-        variables.update(scenario["defaults"])
-    if extra_vars:
-        variables.update(extra_vars)
-
-    all_rounds = []
-
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-
-        for r in range(1, repeat_count + 1):
-            prefix = f"/tmp/scenario_{scenario['id']}_r{r}"
-            result = run_scenario(browser, scenario, variables, auth_state_path, prefix, f"[{r}/{repeat_count}회차]")
-            result["round"] = r
-            all_rounds.append(result)
-
-            # 세션 만료 시 중단
-            if any("세션 만료" in s.get("error", "") for s in result["steps"]):
-                print(f"\n세션 만료 — 재로그인 필요. 테스트 중단.")
-                break
-
-        browser.close()
-
-    # 요약
-    print(f"\n{'='*50}")
-    print(f"반복 테스트 결과 — {scenario['name']} ({len(all_rounds)}회)")
-    print(f"대상: {base_url}")
-    print(f"{'='*50}")
-
-    pass_count = sum(1 for r in all_rounds if r["status"] == "pass")
-    fail_count = len(all_rounds) - pass_count
-
-    for r in all_rounds:
-        icon = "PASS" if r["status"] == "pass" else "FAIL"
-        step_pass = sum(1 for s in r["steps"] if s["status"] == "pass")
-        step_total = len(r["steps"])
-        fail_info = ""
-        if r["status"] == "fail":
-            fail_step = next((s for s in r["steps"] if s["status"] == "fail"), None)
-            if fail_step:
-                fail_info = f" — {fail_step['desc']}"
-                if fail_step.get("error"):
-                    fail_info += f": {fail_step['error']}"
-        print(f"  {r['round']}회차: {icon} ({step_pass}/{step_total} 스텝){fail_info}")
-
-    rate = (pass_count / len(all_rounds) * 100) if all_rounds else 0
-    print(f"\n요약: {len(all_rounds)}회 중 {pass_count}회 성공, {fail_count}회 실패 (성공률 {rate:.1f}%)")
-    return all_rounds
-
-
 # ── 직접 실행 시 ──
 
 if __name__ == "__main__":
@@ -525,7 +694,3 @@ if __name__ == "__main__":
         feature = sys.argv[4] if len(sys.argv) > 4 else "age-calculation/"
         category = sys.argv[5] if len(sys.argv) > 5 else None
         run_all(base_url, feature, auth_path, category=category)
-    elif mode == "repeat":
-        scenario_path = sys.argv[4] if len(sys.argv) > 4 else "age-calculation/input-to-result.json"
-        repeat_count = int(sys.argv[5]) if len(sys.argv) > 5 else 3
-        run_repeat(base_url, scenario_path, repeat_count, auth_path)

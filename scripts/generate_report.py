@@ -2,14 +2,14 @@
 """
 instech 시나리오 테스트 HTML 리포트 생성기
 - scenario_runner.py 와 연동하여 실행 결과 + 스크린샷을 HTML 리포트로 생성
-- 전체 시나리오 / 반복 테스트 모두 지원
 """
 
 import base64
 import glob
 import os
 from datetime import datetime
-from scenario_runner import fetch_scenario, run_all, run_repeat
+from scenario_runner import fetch_scenario, run_all, run_scenario
+from playwright.sync_api import sync_playwright
 
 
 def encode_screenshot(path):
@@ -215,11 +215,10 @@ def render_meta_html(now, base_url, extra_items=None):
 </div>"""
 
 
-# ── 전체 시나리오 리포트 ──
+# ── 공통 HTML 리포트 렌더링 ──
 
-def generate_report(base_url, feature_path, auth_state_path, category=None, extra_vars=None):
-    all_results = run_all(base_url, feature_path, auth_state_path, category=category, extra_vars=extra_vars)
-
+def _render_report_html(all_results, base_url, title="instech 시나리오 테스트 리포트", subtitle="", extra_meta=None):
+    """결과 리스트 → HTML 리포트 문자열"""
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     total = len(all_results)
     passed = sum(1 for r in all_results if r["status"] == "pass")
@@ -227,20 +226,22 @@ def generate_report(base_url, feature_path, auth_state_path, category=None, extr
     total_steps = sum(len(r["steps"]) for r in all_results)
     passed_steps = sum(1 for r in all_results for s in r["steps"] if s["status"] == "pass")
 
+    subtitle_html = f'<p style="color:var(--text-light);margin-bottom:20px;font-size:14px;">{subtitle}</p>' if subtitle else ""
+
     html = f"""<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>instech 시나리오 테스트 리포트</title>
+<title>{title}</title>
 <style>{COMMON_CSS}</style>
 </head>
 <body>
 
-<h1>instech 시나리오 테스트 리포트</h1>
-<p style="color:var(--text-light);margin-bottom:20px;font-size:14px;">보험 나이 계산 기능 E2E 테스트 결과</p>
+<h1>{title}</h1>
+{subtitle_html}
 
-{render_meta_html(now, base_url)}
+{render_meta_html(now, base_url, extra_items=extra_meta)}
 
 <div class="summary">
   <div class="summary-card total">
@@ -305,97 +306,58 @@ def generate_report(base_url, feature_path, auth_state_path, category=None, extr
     return html
 
 
-# ── 반복 테스트 리포트 ──
+# ── 전체 시나리오 리포트 ──
 
-def generate_repeat_report(base_url, scenario_path, repeat_count, auth_state_path, extra_vars=None):
-    all_rounds = run_repeat(base_url, scenario_path, repeat_count, auth_state_path, extra_vars=extra_vars)
+def generate_report(base_url, feature_path, auth_state_path, category=None, extra_vars=None, labels=None):
+    all_results = run_all(base_url, feature_path, auth_state_path, category=category, extra_vars=extra_vars, labels=labels)
+    return _render_report_html(all_results, base_url, subtitle="E2E 테스트 결과")
 
-    # 시나리오 상세 JSON
-    try:
-        detail = fetch_scenario(scenario_path)
-    except Exception:
-        detail = {}
 
-    scenario_name = detail.get("name", scenario_path)
-    scenario_id = detail.get("id", scenario_path.replace("/", "-").replace(".json", ""))
-    description = detail.get("description", "")
+# ── 단일 시나리오 리포트 ──
 
-    now = datetime.now().strftime("%Y-%m-%d %H:%M")
-    total = len(all_rounds)
-    passed = sum(1 for r in all_rounds if r["status"] == "pass")
-    failed = total - passed
-    rate = (passed / total * 100) if total else 0
+def _normalize_url(base_url):
+    """HTTP → HTTPS 자동 변환"""
+    if base_url.startswith("http://"):
+        base_url = base_url.replace("http://", "https://", 1)
+        print(f"[INFO] HTTP → HTTPS 자동 변환: {base_url}")
+    return base_url
 
-    html = f"""<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>instech 반복 테스트 리포트</title>
-<style>{COMMON_CSS}</style>
-</head>
-<body>
 
-<h1>instech 반복 테스트 리포트</h1>
-<p style="color:var(--text-light);margin-bottom:20px;font-size:14px;">{scenario_name}</p>
+def _run_single(base_url, scenario_path, auth_state_path, extra_vars=None):
+    """단일 시나리오 fetch → 변수 설정 → 실행 → 결과 반환"""
+    base_url = _normalize_url(base_url)
 
-{render_meta_html(now, base_url, [("시나리오", scenario_name), ("반복 횟수", f"{repeat_count}회")])}
+    scenario = fetch_scenario(scenario_path)
+    variables = {"baseUrl": base_url}
+    if scenario.get("defaults"):
+        variables.update(scenario["defaults"])
+    if extra_vars:
+        variables.update(extra_vars)
 
-<div class="summary">
-  <div class="summary-card total">
-    <div class="summary-num total">{total}</div>
-    <div class="summary-label">전체 라운드</div>
-  </div>
-  <div class="summary-card pass">
-    <div class="summary-num pass">{passed}</div>
-    <div class="summary-label">성공</div>
-  </div>
-  <div class="summary-card fail">
-    <div class="summary-num fail">{failed}</div>
-    <div class="summary-label">실패</div>
-  </div>
-  <div class="summary-card total">
-    <div class="summary-num total" style="color:#8b5cf6">{rate:.1f}%</div>
-    <div class="summary-label">성공률</div>
-  </div>
-</div>
+    screenshot_prefix = f"/tmp/scenario_{scenario['id']}"
 
-<div class="scenario-desc" style="background:white;border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:16px;">
-  {description}
-</div>
-"""
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        result = run_scenario(browser, scenario, variables, auth_state_path, screenshot_prefix)
+        browser.close()
 
-    for result in all_rounds:
-        round_num = result.get("round", 0)
-        status = result["status"]
-        badge_text = "통과" if status == "pass" else "실패"
-        open_class = "open" if status == "fail" else ""
-        step_pass = sum(1 for s in result["steps"] if s["status"] == "pass")
-        step_total = len(result["steps"])
+    return result, base_url
 
-        # 라운드별 스크린샷: /tmp/scenario_{id}_r{round}_*.png
-        screenshots = find_screenshots(f"/tmp/scenario_{scenario_id}_r{round_num}")
 
-        html += f"""
-<div class="scenario {open_class}">
-  <div class="scenario-header" onclick="this.parentElement.classList.toggle('open')">
-    <span class="arrow">&#9654;</span>
-    <span class="badge {status}">{badge_text}</span>
-    <span class="scenario-title">{round_num}회차</span>
-    <span style="font-size:13px;color:var(--text-light)">{step_pass}/{step_total} 스텝</span>
-  </div>
-  <div class="scenario-body">
-{render_steps_html(result["steps"], screenshots)}  </div>
-</div>
-"""
+def generate_single_report(base_url, scenario_path, auth_state_path, extra_vars=None):
+    """단일 시나리오 실행 + HTML 리포트 생성"""
+    result, base_url = _run_single(base_url, scenario_path, auth_state_path, extra_vars)
 
-    html += f"""
-<div class="footer">
-  instech 반복 테스트 &middot; {now} &middot; 생성: Claude Code (instech-scenario-test)
-</div>
-</body>
-</html>"""
-    return html
+    # 콘솔 요약
+    step_pass = sum(1 for s in result["steps"] if s["status"] == "pass")
+    step_total = len(result["steps"])
+    print(f"\n결과: {result['status'].upper()} ({step_pass}/{step_total} 스텝)")
+
+    return _render_report_html(
+        [result], base_url,
+        title=result["name"],
+        subtitle=result.get("description", ""),
+    )
 
 
 # ── CLI ──
@@ -403,14 +365,18 @@ def generate_repeat_report(base_url, scenario_path, repeat_count, auth_state_pat
 if __name__ == "__main__":
     import sys
 
-    # --var key=value 파싱 (예: --var entryType=OTHER)
+    # --var key=value, --label value 파싱
     extra_vars = {}
+    labels = []
     positional = []
     i = 1
     while i < len(sys.argv):
         if sys.argv[i] == "--var" and i + 1 < len(sys.argv):
             k, v = sys.argv[i + 1].split("=", 1)
             extra_vars[k] = v
+            i += 2
+        elif sys.argv[i] == "--label" and i + 1 < len(sys.argv):
+            labels.append(sys.argv[i + 1])
             i += 2
         else:
             positional.append(sys.argv[i])
@@ -424,14 +390,18 @@ if __name__ == "__main__":
 
     if mode == "all":
         feature = positional[3] if len(positional) > 3 else "age-calculation/"
-        category = positional[4] if len(positional) > 4 else None
-        report_html = generate_report(base_url, feature, auth_path, category=category, extra_vars=extra_vars or None)
-    elif mode == "repeat":
-        scenario_path = positional[3] if len(positional) > 3 else "age-calculation/input-to-result.json"
-        repeat_count = int(positional[4]) if len(positional) > 4 else 3
-        report_html = generate_repeat_report(base_url, scenario_path, repeat_count, auth_path, extra_vars=extra_vars or None)
+        report_html = generate_report(base_url, feature, auth_path, extra_vars=extra_vars or None, labels=labels or None)
+    elif mode == "single":
+        scenario_path = positional[3] if len(positional) > 3 else ""
+        if not scenario_path:
+            print("Usage: generate_report.py single <base_url> <auth_state_path> <scenario_path> [--var key=value]")
+            sys.exit(1)
+        report_html = generate_single_report(base_url, scenario_path, auth_path, extra_vars=extra_vars or None)
     else:
         print(f"Unknown mode: {mode}")
+        print("Usage:")
+        print("  generate_report.py all    <base_url> <auth_state_path> <feature_folder> [--var k=v] [--label l]")
+        print("  generate_report.py single <base_url> <auth_state_path> <scenario_path>  [--var k=v]")
         sys.exit(1)
 
     with open(output_path, "w", encoding="utf-8") as f:
