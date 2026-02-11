@@ -1,5 +1,5 @@
 {
-  "version": "1.4.0",
+  "version": "1.5.0",
   "basePageUrl": "https://hj8902.github.io/instech_scenarios",
   "scenarios": [
     {
@@ -181,6 +181,42 @@
       "path": "counsel/chat-gender-x-terms-new.json"
     },
     {
+      "id": "counsel-over51-inperson-gender-o-terms-agreed",
+      "name": "51세 이상 대면 (유저 정보 있음, 약관 동의됨)",
+      "description": "주제 선택 → (방식 선택 스킵) → 지역/일정 선택 → 정보 확인 → 상담 신청 완료",
+      "type": "test",
+      "labels": ["happy-path", "over51", "inperson", "gender-o", "terms-agreed"],
+      "requiresAuth": true,
+      "path": "counsel/over51-inperson-gender-o-terms-agreed.json"
+    },
+    {
+      "id": "counsel-over51-inperson-gender-o-terms-new",
+      "name": "51세 이상 대면 (유저 정보 있음, 약관 미동의)",
+      "description": "주제 선택 → (방식 선택 스킵) → 지역/일정 선택 → 정보 확인 → 약관 동의 → 상담 신청 완료",
+      "type": "test",
+      "labels": ["happy-path", "over51", "inperson", "gender-o", "terms-new"],
+      "requiresAuth": true,
+      "path": "counsel/over51-inperson-gender-o-terms-new.json"
+    },
+    {
+      "id": "counsel-over51-inperson-gender-x-terms-agreed",
+      "name": "51세 이상 대면 (성별 미입력, 약관 동의됨)",
+      "description": "주제 선택 → (방식 선택 스킵) → 지역/일정 선택 → 정보 수정 → 상담 신청 완료",
+      "type": "test",
+      "labels": ["happy-path", "over51", "inperson", "gender-x", "terms-agreed"],
+      "requiresAuth": true,
+      "path": "counsel/over51-inperson-gender-x-terms-agreed.json"
+    },
+    {
+      "id": "counsel-over51-inperson-gender-x-terms-new",
+      "name": "51세 이상 대면 (성별 미입력, 약관 미동의)",
+      "description": "주제 선택 → (방식 선택 스킵) → 지역/일정 선택 → 정보 수정 → 약관 동의 → 상담 신청 완료",
+      "type": "test",
+      "labels": ["happy-path", "over51", "inperson", "gender-x", "terms-new"],
+      "requiresAuth": true,
+      "path": "counsel/over51-inperson-gender-x-terms-new.json"
+    },
+    {
       "id": "counsel-state-setup-assign-target-ga",
       "name": "원하는 GA 배정 후 상담 신청",
       "description": "원하는 GA가 배정될 때까지 반복 후 전화 상담 신청 완료 (최대 20회)",
@@ -269,6 +305,15 @@
       "labels": ["edge-case"],
       "requiresAuth": true,
       "path": "counsel/edge-user-edit-invalid-type-redirect.json"
+    },
+    {
+      "id": "counsel-edge-over51-capacity-limit",
+      "name": "51세 이상 대면 capacity 부족 시 제한 모달",
+      "description": "51세 이상 유저 → 주제 선택 → 다음 → capacity 부족 → 제한 모달 표시",
+      "type": "test",
+      "labels": ["edge-case", "over51"],
+      "requiresAuth": true,
+      "path": "counsel/edge-over51-capacity-limit.json"
     }
   ]
 }
